@@ -26,6 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const srtOutput = document.getElementById('srtOutput');
     const captionDisplay = document.getElementById('captionDisplay');
     const voiceSelect = document.getElementById('voiceSelect');
+    const addFavBtn = document.getElementById('addFavBtn');
+    const favoritesList = document.getElementById('favoritesList');
     const modelRadios = document.querySelectorAll('input[name="model"]');
     const exportMp3Btn = document.getElementById('exportMp3Btn');
     const exportWavBtn = document.getElementById('exportWavBtn');
@@ -69,20 +71,45 @@ document.addEventListener('DOMContentLoaded', () => {
         "kokoro": {
           "default_voice": "am_adam",
           "voices": [
-            {"id": "am_adam", "name": "Adam (Deep Male)", "gender": "Male", "lang": "English (US)", "tags": ["Deep", "Narrator"]},
-            {"id": "af_bella", "name": "Bella (Warm Female)", "gender": "Female", "lang": "English (US)", "tags": ["Warm", "Storyteller"]},
-            {"id": "af_sarah", "name": "Sarah (Energetic Female)", "gender": "Female", "lang": "English (US)", "tags": ["Upbeat", "Shorts"]},
-            {"id": "am_michael", "name": "Michael (Clear Male)", "gender": "Male", "lang": "English (US)", "tags": ["Professional"]},
-            {"id": "bf_emma", "name": "Emma (Classy British)", "gender": "Female", "lang": "English (UK)", "tags": ["Smooth", "British"]}
+            {"id": "am_adam", "name": "Adam (Deep Male, US)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "am_michael", "name": "Michael (Professional Male, US)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "af_bella", "name": "Bella (Warm Female, US)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "af_nicole", "name": "Nicole (Clear Female, US)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "af_sarah", "name": "Sarah (Energetic Female, US)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "af_sky", "name": "Sky (Casual Female, US)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "af", "name": "Default Female (US)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "bm_george", "name": "George (Deep Male, UK)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "bm_lewis", "name": "Lewis (Casual Male, UK)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "bf_emma", "name": "Emma (Classy Female, UK)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "bf_isabella", "name": "Isabella (Smooth Female, UK)", "gender": "Female", "lang": "English", "tags": []}
           ]
         },
         "edge_tts": {
           "default_voice": "en-US-GuyNeural",
           "voices": [
-            {"id": "en-US-GuyNeural", "name": "Guy (Classic Male)", "gender": "Male", "lang": "English (US)", "tags": ["Rich", "Famous"]},
-            {"id": "en-US-JennyNeural", "name": "Jenny (Conversational)", "gender": "Female", "lang": "English (US)", "tags": ["Expressive", "Famous"]},
-            {"id": "en-US-ChristopherNeural", "name": "Christopher (Storyteller)", "gender": "Male", "lang": "English (US)", "tags": ["Dramatic"]},
-            {"id": "en-US-AnaNeural", "name": "Ana (Young Female)", "gender": "Female", "lang": "English (US)", "tags": ["Friendly"]}
+            {"id": "en-US-GuyNeural", "name": "Guy (Classic Male, US)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-US-ChristopherNeural", "name": "Christopher (Storyteller, US)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-US-EricNeural", "name": "Eric (Authoritative, US)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-US-SteffanNeural", "name": "Steffan (Deep Male, US)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-US-RogerNeural", "name": "Roger (Clear Male, US)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-US-AndrewNeural", "name": "Andrew (Casual Male, US)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-US-BrianNeural", "name": "Brian (Friendly Male, US)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-GB-RyanNeural", "name": "Ryan (Male, UK)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-GB-ThomasNeural", "name": "Thomas (Male, UK)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-ZA-LukeNeural", "name": "Luke (Male, ZA)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-US-JennyNeural", "name": "Jenny (Conversational, US)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-US-AriaNeural", "name": "Aria (Energetic Female, US)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-US-AnaNeural", "name": "Ana (Child/Young Girl, US)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-US-AvaNeural", "name": "Ava (Clear Female, US)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-US-EmmaNeural", "name": "Emma (Smooth Female, US)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-US-MichelleNeural", "name": "Michelle (Warm Female, US)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-GB-SoniaNeural", "name": "Sonia (Female, UK)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-GB-LibbyNeural", "name": "Libby (Female, UK)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-GB-MaisieNeural", "name": "Maisie (Child/Young Girl, UK)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-AU-NatashaNeural", "name": "Natasha (Female, AU)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-ZA-LeahNeural", "name": "Leah (Female, ZA)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-IE-EmilyNeural", "name": "Emily (Female, Ireland)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-NZ-MollyNeural", "name": "Molly (Female, NZ)", "gender": "Female", "lang": "English", "tags": []}
           ]
         },
         "piper": {
@@ -91,24 +118,6 @@ document.addEventListener('DOMContentLoaded', () => {
             {"id": "en_US-lessac-high", "name": "Lessac (Audiobook)", "gender": "Female", "lang": "English (US)", "tags": ["Consistent"]},
             {"id": "en_US-ryan-high", "name": "Ryan (Clear Male)", "gender": "Male", "lang": "English (US)", "tags": ["Fast", "Stable"]},
             {"id": "en_US-joe-medium", "name": "Joe (Friendly)", "gender": "Male", "lang": "English (US)", "tags": ["Casual"]}
-          ]
-        },
-        "styletts2": {
-          "default_voice": "default",
-          "voices": [
-            {"id": "default", "name": "StyleTTS 2 Default", "gender": "Neutral", "lang": "English", "tags": ["Emotional", "Human-like"]}
-          ]
-        },
-        "chattts": {
-          "default_voice": "casual",
-          "voices": [
-            {"id": "casual", "name": "Casual Chat", "gender": "Neutral", "lang": "English", "tags": ["Podcast", "Natural"]}
-          ]
-        },
-        "f5-tts": {
-          "default_voice": "f5_default",
-          "voices": [
-            {"id": "f5_default", "name": "F5-TTS Voice", "gender": "Neutral", "lang": "Multi", "tags": ["Robust", "Clone"]}
           ]
         }
       }
@@ -138,6 +147,71 @@ document.addEventListener('DOMContentLoaded', () => {
     modelRadios.forEach(radio => radio.addEventListener('change', updateVoices));
     // Initial population
     updateVoices();
+
+    // Favorites Logic
+    let favorites = JSON.parse(localStorage.getItem('tts_favorites')) || [];
+
+    function renderFavorites() {
+        if (!favoritesList) return;
+        favoritesList.innerHTML = '';
+        if (favorites.length === 0) {
+            favoritesList.innerHTML = '<span class="text-gray-500 italic text-xs">No favorites yet. Click the star icon to add one!</span>';
+            return;
+        }
+        
+        favorites.forEach((fav, index) => {
+            const span = document.createElement('span');
+            span.className = 'bg-gray-800 px-2 py-1 rounded text-xs text-textSub cursor-pointer flex items-center gap-1 hover:bg-gray-700 transition-colors border border-gray-700 shadow-sm';
+            
+            const nameDiv = document.createElement('div');
+            nameDiv.innerHTML = `<i class="fas fa-star text-yellow-500"></i> ${fav.name}`;
+            nameDiv.onclick = () => {
+                const radio = document.querySelector(`input[name="model"][value="${fav.model}"]`);
+                if(radio) {
+                    radio.checked = true;
+                    updateVoices();
+                    voiceSelect.value = fav.id;
+                }
+            };
+            
+            const removeIcon = document.createElement('i');
+            removeIcon.className = 'fas fa-times ml-1 text-gray-500 hover:text-red-400';
+            removeIcon.onclick = (e) => {
+                e.stopPropagation();
+                favorites.splice(index, 1);
+                localStorage.setItem('tts_favorites', JSON.stringify(favorites));
+                renderFavorites();
+            };
+            
+            span.appendChild(nameDiv);
+            span.appendChild(removeIcon);
+            favoritesList.appendChild(span);
+        });
+    }
+
+    renderFavorites();
+
+    if(addFavBtn) {
+        addFavBtn.addEventListener('click', () => {
+            const selectedModel = document.querySelector('input[name="model"]:checked').value;
+            const selectedVoiceId = voiceSelect.value;
+            
+            const voiceData = config.models[selectedModel].voices.find(v => v.id === selectedVoiceId);
+            if(!voiceData) return;
+            
+            const shortName = voiceData.name.split(' (')[0];
+            
+            if (!favorites.find(f => f.id === selectedVoiceId && f.model === selectedModel)) {
+                favorites.push({
+                    model: selectedModel,
+                    id: selectedVoiceId,
+                    name: shortName
+                });
+                localStorage.setItem('tts_favorites', JSON.stringify(favorites));
+                renderFavorites();
+            }
+        });
+    }
 
     // Text Input logic
     textInput.addEventListener('input', () => {

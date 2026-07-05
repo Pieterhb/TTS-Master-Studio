@@ -93,46 +93,8 @@ async def generate_tts_chunk(text: str, model: str, voice: str, speed: float, in
             await asyncio.to_thread(run_kokoro)
             return output_path
             
-        elif model == "styletts2":
-            import asyncio
-            def run_styletts2():
-                # Mocking StyleTTS2 implementation as user requested integration via 'styletts2' Python package
-                # which would usually require loading a model and generating.
-                # Here we simulate using a python package
-                import soundfile as sf
-                import numpy as np
-                # Fallback to sine wave if package not fully configured
-                sample_rate = 24000
-                samples = np.sin(2 * np.pi * 440 * np.linspace(0, 1, sample_rate))
-                sf.write(output_path, samples, sample_rate)
-
-            await asyncio.to_thread(run_styletts2)
-            return output_path
-            
-        elif model == "chattts":
-            import asyncio
-            def run_chattts():
-                import ChatTTS
-                import soundfile as sf
-                chat = ChatTTS.Chat()
-                chat.load(compile=False) # load models
-                wavs = chat.infer([text])
-                sf.write(output_path, wavs[0], 24000)
-
-            await asyncio.to_thread(run_chattts)
-            return output_path
-            
-        elif model == "f5-tts":
-            import asyncio
-            def run_f5tts():
-                # Connects to Pinokio local Gradio server
-                client = Client("http://127.0.0.1:7860/")
-                result = client.predict(text, voice, speed, api_name="/synthesize")
-                audio_file = result[0] if isinstance(result, tuple) else result
-                shutil.copy(audio_file, output_path)
-
-            await asyncio.to_thread(run_f5tts)
-            return output_path
+        else:
+            raise ValueError(f"Unsupported model: {model}")
             
     except Exception as e:
         print(f"\n[!] Error generating audio with {model}: {e}")

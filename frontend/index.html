@@ -68,18 +68,7 @@
                         <input type="radio" name="model" value="piper" class="accent-highlight">
                         <span>Piper (Local)</span>
                     </label>
-                    <label class="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-gray-800">
-                        <input type="radio" name="model" value="styletts2" class="accent-highlight">
-                        <span>StyleTTS 2</span>
-                    </label>
-                    <label class="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-gray-800">
-                        <input type="radio" name="model" value="chattts" class="accent-highlight">
-                        <span>ChatTTS (Local CPU)</span>
-                    </label>
-                    <label class="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-gray-800">
-                        <input type="radio" name="model" value="f5-tts" class="accent-highlight">
-                        <span>F5-TTS (via Pinokio)</span>
-                    </label>
+
                 </div>
             </div>
 
@@ -91,9 +80,14 @@
                     <button class="flex-1 bg-gray-800 hover:bg-gray-700 py-1 rounded text-sm">Female</button>
                 </div>
                 
-                <select id="voiceSelect" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-sm mb-3 focus:outline-none focus:border-accent">
-                    <!-- Options populated by JS -->
-                </select>
+                <div class="flex gap-2 mb-3">
+                    <select id="voiceSelect" class="flex-1 w-full bg-gray-800 border border-gray-700 rounded p-2 text-sm focus:outline-none focus:border-accent">
+                        <!-- Options populated by JS -->
+                    </select>
+                    <button id="addFavBtn" class="bg-gray-800 hover:bg-gray-700 text-yellow-500 px-3 rounded border border-gray-700 transition-colors" title="Add to Favorites">
+                        <i class="fas fa-star"></i>
+                    </button>
+                </div>
 
                 <div class="relative mb-3">
                     <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
@@ -102,9 +96,8 @@
 
                 <div class="text-sm">
                     <span class="text-gray-400">Favorites:</span>
-                    <div class="flex gap-2 mt-2">
-                        <span class="bg-gray-800 px-2 py-1 rounded text-xs text-textSub cursor-pointer"><i class="fas fa-star text-yellow-500 mr-1"></i> Bella</span>
-                        <span class="bg-gray-800 px-2 py-1 rounded text-xs text-textSub cursor-pointer"><i class="fas fa-star text-yellow-500 mr-1"></i> Adam</span>
+                    <div id="favoritesList" class="flex flex-wrap gap-2 mt-2">
+                        <!-- Favorites populated by JS -->
                     </div>
                 </div>
             </div>
