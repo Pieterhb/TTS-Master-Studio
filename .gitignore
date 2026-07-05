@@ -1,0 +1,19 @@
+# Python and Environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.env
+
+# Application Data & Large Models
+backend/cache/
+backend/models/
+frontend/exports/
+*.wav
+*.mp3
+
+# OS generated files
+.DS_Store
+Thumbs.db

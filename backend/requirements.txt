@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+pydub
+faster-whisper
+gradio-client
+python-dotenv
+pydantic
+python-multipart
+kokoro-onnx
+soundfile
+styletts2
+ChatTTS
