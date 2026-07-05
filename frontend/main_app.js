@@ -28,6 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const voiceSelect = document.getElementById('voiceSelect');
     const addFavBtn = document.getElementById('addFavBtn');
     const favoritesList = document.getElementById('favoritesList');
+    const filterMaleBtn = document.getElementById('filterMaleBtn');
+    const filterFemaleBtn = document.getElementById('filterFemaleBtn');
     const modelRadios = document.querySelectorAll('input[name="model"]');
     const exportMp3Btn = document.getElementById('exportMp3Btn');
     const exportWavBtn = document.getElementById('exportWavBtn');
@@ -87,29 +89,53 @@ document.addEventListener('DOMContentLoaded', () => {
         "edge_tts": {
           "default_voice": "en-US-GuyNeural",
           "voices": [
-            {"id": "en-US-GuyNeural", "name": "Guy (Classic Male, US)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-US-ChristopherNeural", "name": "Christopher (Storyteller, US)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-US-EricNeural", "name": "Eric (Authoritative, US)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-US-SteffanNeural", "name": "Steffan (Deep Male, US)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-US-RogerNeural", "name": "Roger (Clear Male, US)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-US-AndrewNeural", "name": "Andrew (Casual Male, US)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-US-BrianNeural", "name": "Brian (Friendly Male, US)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-GB-RyanNeural", "name": "Ryan (Male, UK)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-GB-ThomasNeural", "name": "Thomas (Male, UK)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-ZA-LukeNeural", "name": "Luke (Male, ZA)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-US-JennyNeural", "name": "Jenny (Conversational, US)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-US-AriaNeural", "name": "Aria (Energetic Female, US)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-US-AnaNeural", "name": "Ana (Child/Young Girl, US)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-US-AvaNeural", "name": "Ava (Clear Female, US)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-US-EmmaNeural", "name": "Emma (Smooth Female, US)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-US-MichelleNeural", "name": "Michelle (Warm Female, US)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-GB-SoniaNeural", "name": "Sonia (Female, UK)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-GB-LibbyNeural", "name": "Libby (Female, UK)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-GB-MaisieNeural", "name": "Maisie (Child/Young Girl, UK)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-AU-NatashaNeural", "name": "Natasha (Female, AU)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-ZA-LeahNeural", "name": "Leah (Female, ZA)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-IE-EmilyNeural", "name": "Emily (Female, Ireland)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-NZ-MollyNeural", "name": "Molly (Female, NZ)", "gender": "Female", "lang": "English", "tags": []}
+            {"id": "en-AU-WilliamMultilingualNeural", "name": "William (AU)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-AU-NatashaNeural", "name": "Natasha (AU)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-CA-ClaraNeural", "name": "Clara (CA)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-CA-LiamNeural", "name": "Liam (CA)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-HK-YanNeural", "name": "Yan (HK)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-HK-SamNeural", "name": "Sam (HK)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-IN-NeerjaExpressiveNeural", "name": "NeerjaExpressive (IN)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-IN-NeerjaNeural", "name": "Neerja (IN)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-IN-PrabhatNeural", "name": "Prabhat (IN)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-IE-ConnorNeural", "name": "Connor (IE)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-IE-EmilyNeural", "name": "Emily (IE)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-KE-AsiliaNeural", "name": "Asilia (KE)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-KE-ChilembaNeural", "name": "Chilemba (KE)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-NZ-MitchellNeural", "name": "Mitchell (NZ)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-NZ-MollyNeural", "name": "Molly (NZ)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-NG-AbeoNeural", "name": "Abeo (NG)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-NG-EzinneNeural", "name": "Ezinne (NG)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-PH-JamesNeural", "name": "James (PH)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-PH-RosaNeural", "name": "Rosa (PH)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-US-AvaNeural", "name": "Ava (US)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-US-AndrewNeural", "name": "Andrew (US)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-US-EmmaNeural", "name": "Emma (US)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-US-BrianNeural", "name": "Brian (US)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-SG-LunaNeural", "name": "Luna (SG)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-SG-WayneNeural", "name": "Wayne (SG)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-ZA-LeahNeural", "name": "Leah (ZA)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-ZA-LukeNeural", "name": "Luke (ZA)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-TZ-ElimuNeural", "name": "Elimu (TZ)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-TZ-ImaniNeural", "name": "Imani (TZ)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-GB-LibbyNeural", "name": "Libby (GB)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-GB-MaisieNeural", "name": "Maisie (GB)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-GB-RyanNeural", "name": "Ryan (GB)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-GB-SoniaNeural", "name": "Sonia (GB)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-GB-ThomasNeural", "name": "Thomas (GB)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-US-AnaNeural", "name": "Ana (US)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-US-AndrewMultilingualNeural", "name": "Andrew (US)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-US-AriaNeural", "name": "Aria (US)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-US-AvaMultilingualNeural", "name": "Ava (US)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-US-BrianMultilingualNeural", "name": "Brian (US)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-US-ChristopherNeural", "name": "Christopher (US)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-US-EmmaMultilingualNeural", "name": "Emma (US)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-US-EricNeural", "name": "Eric (US)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-US-GuyNeural", "name": "Guy (US)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-US-JennyNeural", "name": "Jenny (US)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-US-MichelleNeural", "name": "Michelle (US)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "en-US-RogerNeural", "name": "Roger (US)", "gender": "Male", "lang": "English", "tags": []},
+            {"id": "en-US-SteffanNeural", "name": "Steffan (US)", "gender": "Male", "lang": "English", "tags": []}
           ]
         },
         "piper": {
@@ -123,28 +149,63 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
 
+    let currentGenderFilter = null;
+
     function updateVoices() {
         const selectedModel = document.querySelector('input[name="model"]:checked').value;
         const modelData = config.models[selectedModel];
         
         voiceSelect.innerHTML = '';
         if (modelData && modelData.voices) {
-            modelData.voices.forEach(voice => {
+            let filteredVoices = modelData.voices;
+            if (currentGenderFilter) {
+                filteredVoices = filteredVoices.filter(v => v.gender === currentGenderFilter);
+            }
+            
+            filteredVoices.forEach(voice => {
                 const option = document.createElement('option');
                 option.value = voice.id;
                 option.textContent = voice.name;
                 
-                if (voice.id === modelData.default_voice) {
+                if (voice.id === modelData.default_voice || (filteredVoices.length > 0 && voice.id === filteredVoices[0].id)) {
                     option.selected = true;
                 }
                 
                 voiceSelect.appendChild(option);
             });
         }
+        
+        // Update button styles
+        if (filterMaleBtn && filterFemaleBtn) {
+            if (currentGenderFilter === 'Male') {
+                filterMaleBtn.classList.add('bg-accent', 'text-white');
+                filterFemaleBtn.classList.remove('bg-accent', 'text-white');
+            } else if (currentGenderFilter === 'Female') {
+                filterFemaleBtn.classList.add('bg-accent', 'text-white');
+                filterMaleBtn.classList.remove('bg-accent', 'text-white');
+            } else {
+                filterMaleBtn.classList.remove('bg-accent', 'text-white');
+                filterFemaleBtn.classList.remove('bg-accent', 'text-white');
+            }
+        }
+    }
+
+    if (filterMaleBtn && filterFemaleBtn) {
+        filterMaleBtn.addEventListener('click', () => {
+            currentGenderFilter = currentGenderFilter === 'Male' ? null : 'Male';
+            updateVoices();
+        });
+        filterFemaleBtn.addEventListener('click', () => {
+            currentGenderFilter = currentGenderFilter === 'Female' ? null : 'Female';
+            updateVoices();
+        });
     }
 
     // Listen for model change
-    modelRadios.forEach(radio => radio.addEventListener('change', updateVoices));
+    modelRadios.forEach(radio => radio.addEventListener('change', () => {
+        currentGenderFilter = null; // Reset filter on model change
+        updateVoices();
+    }));
     // Initial population
     updateVoices();
 
@@ -229,18 +290,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // File Upload logic
-    uploadBtn.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                textInput.value = e.target.result;
+    if (uploadBtn && fileInput) {
+        uploadBtn.addEventListener('click', () => {
+            fileInput.value = ''; // Reset to ensure 'change' fires even for the same file
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            try {
+                const text = await file.text();
+                textInput.value = text;
                 textInput.dispatchEvent(new Event('input'));
-            };
-            reader.readAsText(file);
-        }
-    });
+            } catch (error) {
+                console.error("Error reading file:", error);
+                alert("Could not read the text file. Please try a different .txt file.");
+            }
+        });
+    }
 
     // Play/Pause button
     playBtn.addEventListener('click', () => {
