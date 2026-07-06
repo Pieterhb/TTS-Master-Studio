@@ -25,6 +25,7 @@ class GenerateRequest(BaseModel):
     model: str = "kokoro"
     voice: str = "default"
     speed: float = 1.0
+    volume: float = 1.0
     pitch: float = 1.0
     emotion: str = "Storyteller"
 
@@ -38,7 +39,9 @@ async def generate_audio(request: GenerateRequest, background_tasks: BackgroundT
         text=request.text, 
         model=request.model, 
         voice=request.voice, 
-        speed=request.speed
+        speed=request.speed,
+        volume=request.volume,
+        pitch=request.pitch
     )
     
     return result

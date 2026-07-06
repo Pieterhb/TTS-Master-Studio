@@ -2,7 +2,7 @@ import os
 import shutil
 from gradio_client import Client
 
-async def generate_tts_chunk(text: str, model: str, voice: str, speed: float, index: int, cache_dir: str):
+async def generate_tts_chunk(text: str, model: str, voice: str, speed: float, volume: float, pitch: float, index: int, cache_dir: str):
     output_path = os.path.join(cache_dir, f"chunk_{index}.wav")
     hf_token = os.environ.get("HF_TOKEN")
     
@@ -14,7 +14,13 @@ async def generate_tts_chunk(text: str, model: str, voice: str, speed: float, in
             rate_percentage = int((speed - 1.0) * 100)
             rate_str = f"+{rate_percentage}%" if rate_percentage >= 0 else f"{rate_percentage}%"
             
-            communicate = edge_tts.Communicate(text, voice, rate=rate_str)
+            vol_percentage = int((volume - 1.0) * 100)
+            vol_str = f"+{vol_percentage}%" if vol_percentage >= 0 else f"{vol_percentage}%"
+            
+            pitch_percentage = int((pitch - 1.0) * 100)
+            pitch_str = f"+{pitch_percentage}Hz" if pitch_percentage >= 0 else f"{pitch_percentage}Hz"
+            
+            communicate = edge_tts.Communicate(text, voice, rate=rate_str, volume=vol_str, pitch=pitch_str)
             await communicate.save(output_path)
             
             # The saved file is natively an mp3/webm, we can treat it as a stream, but stitcher expects wave module (wav).
@@ -57,6 +63,22 @@ async def generate_tts_chunk(text: str, model: str, voice: str, speed: float, in
                     raise Exception("Piper executable not found! Please download piper.exe to models/piper/piper.exe.")
                 
                 subprocess.run([piper_exe, "-m", model_path, "-f", output_path], input=text.encode('utf-8'))
+                
+                if volume != 1.0:
+                    import wave
+                    import array
+                    with wave.open(output_path, 'rb') as w:
+                        params = w.getparams()
+                        nframes = params.nframes
+                        data = w.readframes(nframes)
+                        
+                    samples = array.array('h', data)
+                    for i in range(len(samples)):
+                        samples[i] = int(max(min(samples[i] * volume, 32767), -32768))
+                        
+                    with wave.open(output_path, 'wb') as w:
+                        w.setparams(params)
+                        w.writeframes(samples.tobytes())
                     
             await asyncio.to_thread(run_piper)
             return output_path
@@ -88,6 +110,7 @@ async def generate_tts_chunk(text: str, model: str, voice: str, speed: float, in
                 
                 k_model = Kokoro(model_path, voices_path)
                 samples, sample_rate = k_model.create(text, voice=voice, speed=speed, lang="en-us")
+                samples = samples * volume
                 sf.write(output_path, samples, sample_rate)
                 
             await asyncio.to_thread(run_kokoro)

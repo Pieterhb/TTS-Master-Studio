@@ -21,8 +21,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const fileInput = document.getElementById('fileInput');
     const generateBtn = document.getElementById('generateBtn');
     const playBtn = document.getElementById('playBtn');
+    const volumeInput = document.getElementById('volume');
+    const volumeVal = document.getElementById('volumeVal');
     const speedInput = document.getElementById('speed');
     const speedVal = document.getElementById('speedVal');
+    const pitchInput = document.getElementById('pitch');
+    const pitchVal = document.getElementById('pitchVal');
     const srtOutput = document.getElementById('srtOutput');
     const captionDisplay = document.getElementById('captionDisplay');
     const voiceSelect = document.getElementById('voiceSelect');
@@ -284,10 +288,24 @@ document.addEventListener('DOMContentLoaded', () => {
         chunkCount.textContent = Math.ceil(words / 500);
     });
 
-    // Speed range
-    speedInput.addEventListener('input', (e) => {
-        speedVal.textContent = parseFloat(e.target.value).toFixed(1) + 'x';
-    });
+    // Speed & Volume range
+    if (speedInput) {
+        speedInput.addEventListener('input', (e) => {
+            speedVal.textContent = parseFloat(e.target.value).toFixed(1) + 'x';
+        });
+    }
+
+    if (volumeInput) {
+        volumeInput.addEventListener('input', (e) => {
+            volumeVal.textContent = parseFloat(e.target.value).toFixed(1) + 'x';
+        });
+    }
+
+    if (pitchInput) {
+        pitchInput.addEventListener('input', (e) => {
+            pitchVal.textContent = parseFloat(e.target.value).toFixed(1) + 'x';
+        });
+    }
 
     // File Upload logic
     if (uploadBtn && fileInput) {
@@ -334,6 +352,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    wavesurfer.on('ready', () => {
+        const duration = wavesurfer.getDuration();
+        const h = Math.floor(duration / 3600);
+        const m = Math.floor((duration % 3600) / 60);
+        const s = Math.floor(duration % 60);
+        const t = Math.floor((duration % 1) * 10);
+        const audioLengthEl = document.getElementById('audioLength');
+        if (audioLengthEl) {
+            audioLengthEl.textContent = `(${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}:${t.toString().padStart(2, '0')})`;
+        }
+    });
+
     function parseSRT(srtString) {
         const regex = /(\d+)\n(\d{2}:\d{2}:\d{2},\d{3}) --> (\d{2}:\d{2}:\d{2},\d{3})\n([\s\S]*?)(?=\n{2}|$)/g;
         let match;
@@ -373,7 +403,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     text: text,
                     model: document.querySelector('input[name="model"]:checked').value,
                     voice: voiceSelect.value,
-                    speed: parseFloat(speedInput.value)
+                    speed: parseFloat(speedInput.value),
+                    volume: parseFloat(volumeInput ? volumeInput.value : 1.0),
+                    pitch: parseFloat(pitchInput ? pitchInput.value : 1.0)
                 })
             });
 

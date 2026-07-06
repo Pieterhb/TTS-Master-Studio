@@ -26,7 +26,7 @@ def split_into_chunks(text: str, max_words=500):
         
     return chunks
 
-async def process_tts_job(text: str, model: str, voice: str, speed: float):
+async def process_tts_job(text: str, model: str, voice: str, speed: float, volume: float = 1.0, pitch: float = 1.0):
     chunks = split_into_chunks(text, max_words=500)
     
     # Calculate absolute paths
@@ -42,7 +42,7 @@ async def process_tts_job(text: str, model: str, voice: str, speed: float):
     # Process chunks with rate limiting simulation
     for i, chunk in enumerate(chunks):
         # In a real scenario, use asyncio.gather for parallelism with semaphore
-        filepath = await generate_tts_chunk(chunk, model, voice, speed, i, cache_dir)
+        filepath = await generate_tts_chunk(chunk, model, voice, speed, volume, pitch, i, cache_dir)
         chunk_files.append(filepath)
     # Output format handling
     is_mp3 = (model == "edge_tts")
