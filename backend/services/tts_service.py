@@ -64,21 +64,26 @@ async def generate_tts_chunk(text: str, model: str, voice: str, speed: float, vo
                 
                 subprocess.run([piper_exe, "-m", model_path, "-f", output_path], input=text.encode('utf-8'))
                 
-                if volume != 1.0:
-                    import wave
-                    import array
-                    with wave.open(output_path, 'rb') as w:
-                        params = w.getparams()
-                        nframes = params.nframes
-                        data = w.readframes(nframes)
-                        
-                    samples = array.array('h', data)
-                    for i in range(len(samples)):
-                        samples[i] = int(max(min(samples[i] * volume, 32767), -32768))
-                        
-                    with wave.open(output_path, 'wb') as w:
-                        w.setparams(params)
-                        w.writeframes(samples.tobytes())
+                # Apply volume and convert to Stereo
+                import wave
+                import array
+                with wave.open(output_path, 'rb') as w:
+                    params = w.getparams()
+                    nframes = params.nframes
+                    data = w.readframes(nframes)
+                    
+                samples = array.array('h', data)
+                stereo_samples = array.array('h')
+                for val in samples:
+                    new_val = int(max(min(val * volume, 32767), -32768))
+                    stereo_samples.append(new_val) # Left channel
+                    stereo_samples.append(new_val) # Right channel
+                    
+                with wave.open(output_path, 'wb') as w:
+                    w.setnchannels(2) # Set to Stereo
+                    w.setsampwidth(params.sampwidth)
+                    w.setframerate(params.framerate)
+                    w.writeframes(stereo_samples.tobytes())
                     
             await asyncio.to_thread(run_piper)
             return output_path
@@ -107,11 +112,15 @@ async def generate_tts_chunk(text: str, model: str, voice: str, speed: float, vo
             def run_kokoro():
                 from kokoro_onnx import Kokoro
                 import soundfile as sf
+                import numpy as np
                 
                 k_model = Kokoro(model_path, voices_path)
                 samples, sample_rate = k_model.create(text, voice=voice, speed=speed, lang="en-us")
                 samples = samples * volume
-                sf.write(output_path, samples, sample_rate)
+                
+                # Convert Mono to Stereo
+                stereo_samples = np.column_stack((samples, samples))
+                sf.write(output_path, stereo_samples, sample_rate)
                 
             await asyncio.to_thread(run_kokoro)
             return output_path

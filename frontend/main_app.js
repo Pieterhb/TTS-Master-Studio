@@ -159,6 +159,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedModel = document.querySelector('input[name="model"]:checked').value;
         const modelData = config.models[selectedModel];
         
+        // Hide MP3 button for local models, show for Edge TTS
+        if (exportMp3Btn) {
+            if (selectedModel === 'kokoro' || selectedModel === 'piper') {
+                exportMp3Btn.style.display = 'none';
+                if (exportWavBtn) exportWavBtn.classList.add('col-span-2');
+            } else {
+                exportMp3Btn.style.display = 'block';
+                if (exportWavBtn) exportWavBtn.classList.remove('col-span-2');
+            }
+        }
+        
         voiceSelect.innerHTML = '';
         if (modelData && modelData.voices) {
             let filteredVoices = modelData.voices;
