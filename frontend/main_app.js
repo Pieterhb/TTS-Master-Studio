@@ -74,8 +74,8 @@ document.addEventListener('DOMContentLoaded', () => {
             for(i = 0; i < numOfChan; i++) {
                 // If the source has only 1 channel, copy it to both (Stereo upmix)
                 let chanData = channels[i % buffer.numberOfChannels];
-                sample = Math.max(-1, Math.min(1, chanData[offset])); 
-                sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767)|0;
+                sample = Math.max(-1, Math.min(1, chanData[offset]));
+                sample = (sample < 0 ? sample * 32768 : sample * 32767)|0;
                 view.setInt16(pos, sample, true); 
                 pos += 2;
             }
@@ -122,34 +122,63 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Export Logic
+    // Helper: direct download of a URL with a given filename
+    function directDownload(url, filename, btn, originalHtml) {
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Downloading...';
+        const a = document.createElement('a');
+        // Add cache-buster so the browser fetches fresh and prompts download
+        a.href = url + '?dl=' + Date.now();
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => { btn.innerHTML = originalHtml; }, 1500);
+    }
+
     exportMp3Btn.addEventListener('click', () => {
-        if (!currentAudioUrl || !wavesurfer.getDecodedData()) return alert("Please generate audio first!");
-        exportMp3Btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Encoding...';
-        setTimeout(() => {
-            let blob = audioBufferToMp3(wavesurfer.getDecodedData());
-            let url = URL.createObjectURL(blob);
-            let a = document.createElement('a');
-            a.href = url;
-            a.download = 'tts_master_output.mp3';
-            a.click();
-            URL.revokeObjectURL(url);
-            exportMp3Btn.innerHTML = '<i class="fas fa-download mr-1"></i> MP3';
-        }, 100);
+        if (!currentAudioUrl) return alert("Please generate audio first!");
+        const originalHtml = '<i class="fas fa-download mr-1"></i> MP3';
+        // If the server produced an MP3 (edge_tts), download it directly — zero re-encoding loss.
+        // If the server produced a WAV (piper/kokoro), fall back to re-encoding via lamejs.
+        if (currentAudioUrl.endsWith('.mp3')) {
+            directDownload(currentAudioUrl, 'tts_master_output.mp3', exportMp3Btn, originalHtml);
+        } else {
+            if (!wavesurfer.getDecodedData()) return alert("Please generate audio first!");
+            exportMp3Btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Encoding...';
+            setTimeout(() => {
+                let blob = audioBufferToMp3(wavesurfer.getDecodedData());
+                let url = URL.createObjectURL(blob);
+                let a = document.createElement('a');
+                a.href = url;
+                a.download = 'tts_master_output.mp3';
+                a.click();
+                URL.revokeObjectURL(url);
+                exportMp3Btn.innerHTML = originalHtml;
+            }, 100);
+        }
     });
 
     exportWavBtn.addEventListener('click', () => {
-        if (!currentAudioUrl || !wavesurfer.getDecodedData()) return alert("Please generate audio first!");
-        exportWavBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Encoding...';
-        setTimeout(() => {
-            let blob = audioBufferToWav(wavesurfer.getDecodedData());
-            let url = URL.createObjectURL(blob);
-            let a = document.createElement('a');
-            a.href = url;
-            a.download = 'tts_master_output.wav';
-            a.click();
-            URL.revokeObjectURL(url);
-            exportWavBtn.innerHTML = '<i class="fas fa-download mr-1"></i> WAV';
-        }, 100);
+        if (!currentAudioUrl) return alert("Please generate audio first!");
+        const originalHtml = '<i class="fas fa-download mr-1"></i> WAV';
+        // If the server produced a WAV (piper/kokoro), download it directly — clean original.
+        // If the server produced an MP3 (edge_tts), fall back to re-encoding from decoded buffer.
+        if (currentAudioUrl.endsWith('.wav')) {
+            directDownload(currentAudioUrl, 'tts_master_output.wav', exportWavBtn, originalHtml);
+        } else {
+            if (!wavesurfer.getDecodedData()) return alert("Please generate audio first!");
+            exportWavBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Encoding...';
+            setTimeout(() => {
+                let blob = audioBufferToWav(wavesurfer.getDecodedData());
+                let url = URL.createObjectURL(blob);
+                let a = document.createElement('a');
+                a.href = url;
+                a.download = 'tts_master_output.wav';
+                a.click();
+                URL.revokeObjectURL(url);
+                exportWavBtn.innerHTML = originalHtml;
+            }, 100);
+        }
     });
 
     exportSrtBtn.addEventListener('click', () => {
