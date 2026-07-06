@@ -43,24 +43,113 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentAudioUrl = null;
     let currentSrtUrl = null;
 
+    // WAV Encoding function
+    function audioBufferToWav(buffer) {
+        let numOfChan = 2; // Force Stereo
+        let length = buffer.length * numOfChan * 2 + 44;
+        let bufferArr = new ArrayBuffer(length);
+        let view = new DataView(bufferArr);
+        let channels = [], i, sample, offset = 0, pos = 0;
+
+        function setUint16(data) { view.setUint16(pos, data, true); pos += 2; }
+        function setUint32(data) { view.setUint32(pos, data, true); pos += 4; }
+
+        setUint32(0x46464952); // "RIFF"
+        setUint32(length - 8); // file length - 8
+        setUint32(0x45564157); // "WAVE"
+        setUint32(0x20746d66); // "fmt " chunk
+        setUint32(16); // length = 16
+        setUint16(1); // PCM (uncompressed)
+        setUint16(numOfChan);
+        setUint32(buffer.sampleRate);
+        setUint32(buffer.sampleRate * 2 * numOfChan); // avg. bytes/sec
+        setUint16(numOfChan * 2); // block-align
+        setUint16(16); // 16-bit
+        setUint32(0x61746164); // "data" - chunk
+        setUint32(length - pos - 4); // chunk length
+
+        for(i = 0; i < buffer.numberOfChannels; i++) channels.push(buffer.getChannelData(i));
+
+        while(pos < length) {
+            for(i = 0; i < numOfChan; i++) {
+                // If the source has only 1 channel, copy it to both (Stereo upmix)
+                let chanData = channels[i % buffer.numberOfChannels];
+                sample = Math.max(-1, Math.min(1, chanData[offset])); 
+                sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767)|0;
+                view.setInt16(pos, sample, true); 
+                pos += 2;
+            }
+            offset++;
+        }
+        return new Blob([bufferArr], {type: "audio/wav"});
+    }
+
+    // MP3 Encoding function using lamejs
+    function audioBufferToMp3(buffer) {
+        let numOfChan = 2; // Force Stereo
+        let sampleRate = buffer.sampleRate;
+        let mp3encoder = new lamejs.Mp3Encoder(numOfChan, sampleRate, 128);
+        let mp3Data = [];
+        
+        let channels = [];
+        for(let i = 0; i < buffer.numberOfChannels; i++) {
+            channels.push(buffer.getChannelData(i));
+        }
+
+        let sampleBlockSize = 1152;
+        let left = new Int16Array(sampleBlockSize);
+        let right = new Int16Array(sampleBlockSize);
+
+        for (let i = 0; i < channels[0].length; i += sampleBlockSize) {
+            let leftChunk = channels[0].subarray(i, i + sampleBlockSize);
+            let rightChunk = (channels.length > 1) ? channels[1].subarray(i, i + sampleBlockSize) : leftChunk;
+            
+            for (let j = 0; j < leftChunk.length; j++) {
+                let ls = Math.max(-1, Math.min(1, leftChunk[j]));
+                let rs = Math.max(-1, Math.min(1, rightChunk[j]));
+                left[j] = (0.5 + ls < 0 ? ls * 32768 : ls * 32767)|0;
+                right[j] = (0.5 + rs < 0 ? rs * 32768 : rs * 32767)|0;
+            }
+
+            let mp3buf = mp3encoder.encodeBuffer(left.subarray(0, leftChunk.length), right.subarray(0, rightChunk.length));
+            if (mp3buf.length > 0) mp3Data.push(new Int8Array(mp3buf));
+        }
+        
+        let mp3buf = mp3encoder.flush();
+        if (mp3buf.length > 0) mp3Data.push(new Int8Array(mp3buf));
+
+        return new Blob(mp3Data, {type: 'audio/mp3'});
+    }
+
     // Export Logic
     exportMp3Btn.addEventListener('click', () => {
-        if (!currentAudioUrl) return alert("Please generate audio first!");
-        // We prompt download of whatever the source is, but user wants MP3 so we name it mp3
-        // Note: Unless converted by backend, this might just be a wav with mp3 extension.
-        // For edge-tts, it is natively MP3.
-        const a = document.createElement('a');
-        a.href = currentAudioUrl;
-        a.download = 'tts_master_output.mp3';
-        a.click();
+        if (!currentAudioUrl || !wavesurfer.getDecodedData()) return alert("Please generate audio first!");
+        exportMp3Btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Encoding...';
+        setTimeout(() => {
+            let blob = audioBufferToMp3(wavesurfer.getDecodedData());
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = 'tts_master_output.mp3';
+            a.click();
+            URL.revokeObjectURL(url);
+            exportMp3Btn.innerHTML = '<i class="fas fa-download mr-1"></i> MP3';
+        }, 100);
     });
 
     exportWavBtn.addEventListener('click', () => {
-        if (!currentAudioUrl) return alert("Please generate audio first!");
-        const a = document.createElement('a');
-        a.href = currentAudioUrl;
-        a.download = 'tts_master_output.wav';
-        a.click();
+        if (!currentAudioUrl || !wavesurfer.getDecodedData()) return alert("Please generate audio first!");
+        exportWavBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Encoding...';
+        setTimeout(() => {
+            let blob = audioBufferToWav(wavesurfer.getDecodedData());
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = 'tts_master_output.wav';
+            a.click();
+            URL.revokeObjectURL(url);
+            exportWavBtn.innerHTML = '<i class="fas fa-download mr-1"></i> WAV';
+        }, 100);
     });
 
     exportSrtBtn.addEventListener('click', () => {
@@ -159,16 +248,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedModel = document.querySelector('input[name="model"]:checked').value;
         const modelData = config.models[selectedModel];
         
-        // Hide MP3 button for local models, show for Edge TTS
-        if (exportMp3Btn) {
-            if (selectedModel === 'kokoro' || selectedModel === 'piper') {
-                exportMp3Btn.style.display = 'none';
-                if (exportWavBtn) exportWavBtn.classList.add('col-span-2');
-            } else {
-                exportMp3Btn.style.display = 'block';
-                if (exportWavBtn) exportWavBtn.classList.remove('col-span-2');
-            }
-        }
+        // Buttons are always visible now since we can encode both MP3 and WAV locally
+        if (exportMp3Btn) exportMp3Btn.style.display = 'block';
+        if (exportWavBtn) exportWavBtn.classList.remove('col-span-2');
         
         voiceSelect.innerHTML = '';
         if (modelData && modelData.voices) {
