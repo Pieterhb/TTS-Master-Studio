@@ -72,7 +72,7 @@ async def process_tts_job(text: str, model: str, voice: str, speed: float, volum
                         data.append(w.readframes(w.getnframes()))
                 except Exception as e:
                     print(f"Error reading WAV chunk {file}: {e}")
-                    
+                
             if params and data:
                 with wave.open(output_audio_path, 'wb') as output:
                     output.setparams(params)

@@ -43,13 +43,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentAudioUrl = null;
     let currentSrtUrl = null;
 
-    // WAV Encoding function
+    // WAV Encoding function (32-bit IEEE Float for Lossless Studio Quality)
     function audioBufferToWav(buffer) {
-        let numOfChan = 2; // Force Stereo
-        let length = buffer.length * numOfChan * 2 + 44;
+        let numOfChan = buffer.numberOfChannels;
+        let length = buffer.length * numOfChan * 4 + 46; // 4 bytes per sample, 46 byte header
         let bufferArr = new ArrayBuffer(length);
         let view = new DataView(bufferArr);
-        let channels = [], i, sample, offset = 0, pos = 0;
+        let channels = [], i, offset = 0, pos = 0;
 
         function setUint16(data) { view.setUint16(pos, data, true); pos += 2; }
         function setUint32(data) { view.setUint32(pos, data, true); pos += 4; }
@@ -58,26 +58,24 @@ document.addEventListener('DOMContentLoaded', () => {
         setUint32(length - 8); // file length - 8
         setUint32(0x45564157); // "WAVE"
         setUint32(0x20746d66); // "fmt " chunk
-        setUint32(16); // length = 16
-        setUint16(1); // PCM (uncompressed)
+        setUint32(18); // length = 18 for IEEE Float
+        setUint16(3); // IEEE Float (3)
         setUint16(numOfChan);
         setUint32(buffer.sampleRate);
-        setUint32(buffer.sampleRate * 2 * numOfChan); // avg. bytes/sec
-        setUint16(numOfChan * 2); // block-align
-        setUint16(16); // 16-bit
+        setUint32(buffer.sampleRate * 4 * numOfChan); // avg. bytes/sec
+        setUint16(numOfChan * 4); // block-align
+        setUint16(32); // 32-bit
+        setUint16(0); // cbSize = 0
+        
         setUint32(0x61746164); // "data" - chunk
         setUint32(length - pos - 4); // chunk length
 
-        for(i = 0; i < buffer.numberOfChannels; i++) channels.push(buffer.getChannelData(i));
+        for(i = 0; i < numOfChan; i++) channels.push(buffer.getChannelData(i));
 
         while(pos < length) {
             for(i = 0; i < numOfChan; i++) {
-                // If the source has only 1 channel, copy it to both (Stereo upmix)
-                let chanData = channels[i % buffer.numberOfChannels];
-                sample = Math.max(-1, Math.min(1, chanData[offset]));
-                sample = (sample < 0 ? sample * 32768 : sample * 32767)|0;
-                view.setInt16(pos, sample, true); 
-                pos += 2;
+                view.setFloat32(pos, channels[i][offset], true); 
+                pos += 4;
             }
             offset++;
         }
@@ -166,18 +164,32 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentAudioUrl.endsWith('.wav')) {
             directDownload(currentAudioUrl, 'tts_master_output.wav', exportWavBtn, originalHtml);
         } else {
-            if (!wavesurfer.getDecodedData()) return alert("Please generate audio first!");
-            exportWavBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Encoding...';
-            setTimeout(() => {
-                let blob = audioBufferToWav(wavesurfer.getDecodedData());
-                let url = URL.createObjectURL(blob);
-                let a = document.createElement('a');
-                a.href = url;
-                a.download = 'tts_master_output.wav';
-                a.click();
-                URL.revokeObjectURL(url);
-                exportWavBtn.innerHTML = originalHtml;
-            }, 100);
+            exportWavBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Decoding...';
+            fetch(currentAudioUrl)
+                .then(res => res.arrayBuffer())
+                .then(buffer => {
+                    // Force decoding at 24000Hz to bypass aggressive resampling low-pass filters in browser
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    const ctx = new AudioContext({ sampleRate: 24000 });
+                    return ctx.decodeAudioData(buffer);
+                })
+                .then(decodedBuffer => {
+                    exportWavBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Encoding...';
+                    // Do not force stereo if mono is fine, but audioBufferToWav does it.
+                    let blob = audioBufferToWav(decodedBuffer);
+                    let url = URL.createObjectURL(blob);
+                    let a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'tts_master_output.wav';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    exportWavBtn.innerHTML = originalHtml;
+                })
+                .catch(err => {
+                    console.error("Error exporting WAV:", err);
+                    alert("Error exporting WAV. See console.");
+                    exportWavBtn.innerHTML = originalHtml;
+                });
         }
     });
 
