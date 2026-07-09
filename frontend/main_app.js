@@ -205,24 +205,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const config = {
       "models": {
         "kokoro": {
-          "default_voice": "am_adam",
+          "default_voice": "bm_fable",
           "voices": [
-            {"id": "am_adam", "name": "Adam (Deep Male, US)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "am_michael", "name": "Michael (Professional Male, US)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "af_bella", "name": "Bella (Warm Female, US)", "gender": "Female", "lang": "English", "tags": []},
+            {"id": "bm_fable", "name": "Fable (British Explorer)", "gender": "Male", "lang": "English", "tags": ["Pulp Action", "Deep"]},
+            {"id": "am_onyx", "name": "Onyx (Gritty Mercenary)", "gender": "Male", "lang": "English", "tags": ["Movie Trailer", "Action"]},
+            {"id": "bm_george", "name": "George (Veteran Scholar)", "gender": "Male", "lang": "English", "tags": ["Campfire Legend", "Deep"]},
+            {"id": "am_fenrir", "name": "Fenrir (The Beast Hunter)", "gender": "Male", "lang": "English", "tags": ["Intense", "Jungle"]},
+            {"id": "am_adam", "name": "Adam (Classic Storyteller)", "gender": "Male", "lang": "English", "tags": ["Classic"]},
+            {"id": "am_michael", "name": "Michael (1940s Radio Announcer)", "gender": "Male", "lang": "English", "tags": ["Punchy"]},
+            {"id": "am_puck", "name": "Puck (Theatrical Rogue)", "gender": "Male", "lang": "English", "tags": ["Expressive", "Dialogue"]},
+            {"id": "af_bella", "name": "Bella (Sultry Femme Fatale)", "gender": "Female", "lang": "English", "tags": ["Warm", "Mystery"]},
+            {"id": "bf_emma", "name": "Emma (Classy Archeologist)", "gender": "Female", "lang": "English", "tags": ["British", "Explorer"]},
+            {"id": "af_heart", "name": "Heart (Dramatic Female Lead)", "gender": "Female", "lang": "English", "tags": ["Cinematic", "Intense"]},
             {"id": "af_nicole", "name": "Nicole (Clear Female, US)", "gender": "Female", "lang": "English", "tags": []},
             {"id": "af_sarah", "name": "Sarah (Energetic Female, US)", "gender": "Female", "lang": "English", "tags": []},
             {"id": "af_sky", "name": "Sky (Casual Female, US)", "gender": "Female", "lang": "English", "tags": []},
             {"id": "af", "name": "Default Female (US)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "bm_george", "name": "George (Deep Male, UK)", "gender": "Male", "lang": "English", "tags": []},
             {"id": "bm_lewis", "name": "Lewis (Casual Male, UK)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "bf_emma", "name": "Emma (Classy Female, UK)", "gender": "Female", "lang": "English", "tags": []},
             {"id": "bf_isabella", "name": "Isabella (Smooth Female, UK)", "gender": "Female", "lang": "English", "tags": []}
           ]
         },
         "edge_tts": {
           "default_voice": "en-US-GuyNeural",
           "voices": [
+            {"id": "en-US-GuyNeural", "name": "Guy (Passionate Narrator)", "gender": "Male", "lang": "English", "tags": ["Action", "Pulp"]},
+            {"id": "en-US-ChristopherNeural", "name": "Christopher (Authoritative)", "gender": "Male", "lang": "English", "tags": ["Deep", "Noir"]},
+            {"id": "en-US-SteffanNeural", "name": "Steffan (Gritty Detective)", "gender": "Male", "lang": "English", "tags": ["Rational", "Mystery"]},
+            {"id": "en-US-AriaNeural", "name": "Aria (Confident Lead)", "gender": "Female", "lang": "English", "tags": ["Protagonist", "Strong"]},
             {"id": "en-AU-WilliamMultilingualNeural", "name": "William (AU)", "gender": "Male", "lang": "English", "tags": []},
             {"id": "en-AU-NatashaNeural", "name": "Natasha (AU)", "gender": "Female", "lang": "English", "tags": []},
             {"id": "en-CA-ClaraNeural", "name": "Clara (CA)", "gender": "Female", "lang": "English", "tags": []},

@@ -94,15 +94,15 @@ async def generate_tts_chunk(text: str, model: str, voice: str, speed: float, vo
             import asyncio
             
             kokoro_dir = "models/kokoro"
-            model_path = os.path.join(kokoro_dir, "kokoro-v0_19.onnx")
-            voices_path = os.path.join(kokoro_dir, "voices.json")
+            model_path = os.path.join(kokoro_dir, "kokoro-v1.0.onnx")
+            voices_path = os.path.join(kokoro_dir, "voices-v1.0.bin")
             
-            # Auto-download Kokoro v0.19 models if missing
+            # Auto-download Kokoro v1.0 models if missing
             if not os.path.exists(model_path) or not os.path.exists(voices_path):
-                print("Downloading Kokoro v0.19 (Approx 80MB)... This will take a moment.")
+                print("Downloading Kokoro v1.0... This will take a moment.")
                 os.makedirs(kokoro_dir, exist_ok=True)
-                model_url = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files/kokoro-v0_19.onnx"
-                voices_url = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files/voices.json"
+                model_url = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.onnx"
+                voices_url = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin"
                 try:
                     urllib.request.urlretrieve(model_url, model_path)
                     urllib.request.urlretrieve(voices_url, voices_path)
@@ -115,7 +115,11 @@ async def generate_tts_chunk(text: str, model: str, voice: str, speed: float, vo
                 import numpy as np
                 
                 k_model = Kokoro(model_path, voices_path)
-                samples, sample_rate = k_model.create(text, voice=voice, speed=speed, lang="en-us")
+                
+                # Dynamically set language based on voice prefix for proper intonation
+                kokoro_lang = "en-gb" if voice.startswith("bm_") or voice.startswith("bf_") else "en-us"
+                
+                samples, sample_rate = k_model.create(text, voice=voice, speed=speed, lang=kokoro_lang)
                 samples = samples * volume
                 
                 # Convert Mono to Stereo
