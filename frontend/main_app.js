@@ -203,94 +203,576 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Voice options configuration
     const config = {
-      "models": {
-        "kokoro": {
-          "default_voice": "bm_fable",
-          "voices": [
-            {"id": "bm_fable", "name": "Fable (British Explorer)", "gender": "Male", "lang": "English", "tags": ["Pulp Action", "Deep"]},
-            {"id": "am_onyx", "name": "Onyx (Gritty Mercenary)", "gender": "Male", "lang": "English", "tags": ["Movie Trailer", "Action"]},
-            {"id": "bm_george", "name": "George (Veteran Scholar)", "gender": "Male", "lang": "English", "tags": ["Campfire Legend", "Deep"]},
-            {"id": "am_fenrir", "name": "Fenrir (The Beast Hunter)", "gender": "Male", "lang": "English", "tags": ["Intense", "Jungle"]},
-            {"id": "am_adam", "name": "Adam (Classic Storyteller)", "gender": "Male", "lang": "English", "tags": ["Classic"]},
-            {"id": "am_michael", "name": "Michael (1940s Radio Announcer)", "gender": "Male", "lang": "English", "tags": ["Punchy"]},
-            {"id": "am_puck", "name": "Puck (Theatrical Rogue)", "gender": "Male", "lang": "English", "tags": ["Expressive", "Dialogue"]},
-            {"id": "af_bella", "name": "Bella (Sultry Femme Fatale)", "gender": "Female", "lang": "English", "tags": ["Warm", "Mystery"]},
-            {"id": "bf_emma", "name": "Emma (Classy Archeologist)", "gender": "Female", "lang": "English", "tags": ["British", "Explorer"]},
-            {"id": "af_heart", "name": "Heart (Dramatic Female Lead)", "gender": "Female", "lang": "English", "tags": ["Cinematic", "Intense"]},
-            {"id": "af_nicole", "name": "Nicole (Clear Female, US)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "af_sarah", "name": "Sarah (Energetic Female, US)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "af_sky", "name": "Sky (Casual Female, US)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "af", "name": "Default Female (US)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "bm_lewis", "name": "Lewis (Casual Male, UK)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "bf_isabella", "name": "Isabella (Smooth Female, UK)", "gender": "Female", "lang": "English", "tags": []}
+  "models": {
+    "kokoro": {
+      "default_voice": "bm_fable",
+      "voices": [
+        {
+          "id": "am_adam",
+          "name": "Adam (Classic Storyteller)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": [
+            "Classic"
           ]
         },
-        "edge_tts": {
-          "default_voice": "en-US-GuyNeural",
-          "voices": [
-            {"id": "en-US-GuyNeural", "name": "Guy (Passionate Narrator)", "gender": "Male", "lang": "English", "tags": ["Action", "Pulp"]},
-            {"id": "en-US-ChristopherNeural", "name": "Christopher (Authoritative)", "gender": "Male", "lang": "English", "tags": ["Deep", "Noir"]},
-            {"id": "en-US-SteffanNeural", "name": "Steffan (Gritty Detective)", "gender": "Male", "lang": "English", "tags": ["Rational", "Mystery"]},
-            {"id": "en-US-AriaNeural", "name": "Aria (Confident Lead)", "gender": "Female", "lang": "English", "tags": ["Protagonist", "Strong"]},
-            {"id": "en-AU-WilliamMultilingualNeural", "name": "William (AU)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-AU-NatashaNeural", "name": "Natasha (AU)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-CA-ClaraNeural", "name": "Clara (CA)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-CA-LiamNeural", "name": "Liam (CA)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-HK-YanNeural", "name": "Yan (HK)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-HK-SamNeural", "name": "Sam (HK)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-IN-NeerjaExpressiveNeural", "name": "NeerjaExpressive (IN)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-IN-NeerjaNeural", "name": "Neerja (IN)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-IN-PrabhatNeural", "name": "Prabhat (IN)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-IE-ConnorNeural", "name": "Connor (IE)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-IE-EmilyNeural", "name": "Emily (IE)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-KE-AsiliaNeural", "name": "Asilia (KE)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-KE-ChilembaNeural", "name": "Chilemba (KE)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-NZ-MitchellNeural", "name": "Mitchell (NZ)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-NZ-MollyNeural", "name": "Molly (NZ)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-NG-AbeoNeural", "name": "Abeo (NG)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-NG-EzinneNeural", "name": "Ezinne (NG)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-PH-JamesNeural", "name": "James (PH)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-PH-RosaNeural", "name": "Rosa (PH)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-US-AvaNeural", "name": "Ava (US)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-US-AndrewNeural", "name": "Andrew (US)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-US-EmmaNeural", "name": "Emma (US)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-US-BrianNeural", "name": "Brian (US)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-SG-LunaNeural", "name": "Luna (SG)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-SG-WayneNeural", "name": "Wayne (SG)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-ZA-LeahNeural", "name": "Leah (ZA)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-ZA-LukeNeural", "name": "Luke (ZA)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-TZ-ElimuNeural", "name": "Elimu (TZ)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-TZ-ImaniNeural", "name": "Imani (TZ)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-GB-LibbyNeural", "name": "Libby (GB)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-GB-MaisieNeural", "name": "Maisie (GB)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-GB-RyanNeural", "name": "Ryan (GB)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-GB-SoniaNeural", "name": "Sonia (GB)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-GB-ThomasNeural", "name": "Thomas (GB)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-US-AnaNeural", "name": "Ana (US)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-US-AndrewMultilingualNeural", "name": "Andrew (US)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-US-AriaNeural", "name": "Aria (US)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-US-AvaMultilingualNeural", "name": "Ava (US)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-US-BrianMultilingualNeural", "name": "Brian (US)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-US-ChristopherNeural", "name": "Christopher (US)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-US-EmmaMultilingualNeural", "name": "Emma (US)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-US-EricNeural", "name": "Eric (US)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-US-GuyNeural", "name": "Guy (US)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-US-JennyNeural", "name": "Jenny (US)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-US-MichelleNeural", "name": "Michelle (US)", "gender": "Female", "lang": "English", "tags": []},
-            {"id": "en-US-RogerNeural", "name": "Roger (US)", "gender": "Male", "lang": "English", "tags": []},
-            {"id": "en-US-SteffanNeural", "name": "Steffan (US)", "gender": "Male", "lang": "English", "tags": []}
+        {
+          "id": "bm_fable",
+          "name": "Fable (British Explorer)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": [
+            "Pulp Action",
+            "Deep"
           ]
         },
-        "piper": {
-          "default_voice": "en_US-ryan-high",
-          "voices": [
-            {"id": "en_US-lessac-high", "name": "Lessac (Audiobook)", "gender": "Female", "lang": "English (US)", "tags": ["Consistent"]},
-            {"id": "en_US-ryan-high", "name": "Ryan (Clear Male)", "gender": "Male", "lang": "English (US)", "tags": ["Fast", "Stable"]},
-            {"id": "en_US-joe-medium", "name": "Joe (Friendly)", "gender": "Male", "lang": "English (US)", "tags": ["Casual"]}
+        {
+          "id": "am_fenrir",
+          "name": "Fenrir (The Beast Hunter)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": [
+            "Intense",
+            "Jungle"
           ]
+        },
+        {
+          "id": "bm_george",
+          "name": "George (Veteran Scholar)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": [
+            "Campfire Legend",
+            "Deep"
+          ]
+        },
+        {
+          "id": "bm_lewis",
+          "name": "Lewis (Casual Male, UK)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "am_michael",
+          "name": "Michael (1940s Radio Announcer)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": [
+            "Punchy"
+          ]
+        },
+        {
+          "id": "am_onyx",
+          "name": "Onyx (Gritty Mercenary)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": [
+            "Movie Trailer",
+            "Action"
+          ]
+        },
+        {
+          "id": "am_puck",
+          "name": "Puck (Theatrical Rogue)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": [
+            "Expressive",
+            "Dialogue"
+          ]
+        },
+        {
+          "id": "af_bella",
+          "name": "Bella (Sultry Femme Fatale)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": [
+            "Warm",
+            "Mystery"
+          ]
+        },
+        {
+          "id": "af",
+          "name": "Default Female (US)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "bf_emma",
+          "name": "Emma (Classy Archeologist)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": [
+            "British",
+            "Explorer"
+          ]
+        },
+        {
+          "id": "af_heart",
+          "name": "Heart (Dramatic Female Lead)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": [
+            "Cinematic",
+            "Intense"
+          ]
+        },
+        {
+          "id": "bf_isabella",
+          "name": "Isabella (Smooth Female, UK)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "af_nicole",
+          "name": "Nicole (Clear Female, US)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "af_sarah",
+          "name": "Sarah (Energetic Female, US)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "af_sky",
+          "name": "Sky (Casual Female, US)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
         }
-      }
-    };
+      ]
+    },
+    "edge_tts": {
+      "default_voice": "en-US-GuyNeural",
+      "voices": [
+        {
+          "id": "en-NG-AbeoNeural",
+          "name": "Abeo (NG)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-US-AndrewNeural",
+          "name": "Andrew (US)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-US-AndrewMultilingualNeural",
+          "name": "Andrew (US)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-US-BrianNeural",
+          "name": "Brian (US)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-US-BrianMultilingualNeural",
+          "name": "Brian (US)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-KE-ChilembaNeural",
+          "name": "Chilemba (KE)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-US-ChristopherNeural",
+          "name": "Christopher (Authoritative)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": [
+            "Deep",
+            "Noir"
+          ]
+        },
+        {
+          "id": "en-US-ChristopherNeural",
+          "name": "Christopher (US)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-IE-ConnorNeural",
+          "name": "Connor (IE)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-TZ-ElimuNeural",
+          "name": "Elimu (TZ)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-US-EricNeural",
+          "name": "Eric (US)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-US-GuyNeural",
+          "name": "Guy (Passionate Narrator)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": [
+            "Action",
+            "Pulp"
+          ]
+        },
+        {
+          "id": "en-US-GuyNeural",
+          "name": "Guy (US)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-PH-JamesNeural",
+          "name": "James (PH)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-CA-LiamNeural",
+          "name": "Liam (CA)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-ZA-LukeNeural",
+          "name": "Luke (ZA)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-NZ-MitchellNeural",
+          "name": "Mitchell (NZ)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-IN-PrabhatNeural",
+          "name": "Prabhat (IN)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-US-RogerNeural",
+          "name": "Roger (US)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-GB-RyanNeural",
+          "name": "Ryan (GB)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-HK-SamNeural",
+          "name": "Sam (HK)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-US-SteffanNeural",
+          "name": "Steffan (Gritty Detective)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": [
+            "Rational",
+            "Mystery"
+          ]
+        },
+        {
+          "id": "en-US-SteffanNeural",
+          "name": "Steffan (US)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-GB-ThomasNeural",
+          "name": "Thomas (GB)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-SG-WayneNeural",
+          "name": "Wayne (SG)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-AU-WilliamMultilingualNeural",
+          "name": "William (AU)",
+          "gender": "Male",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-US-AnaNeural",
+          "name": "Ana (US)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-US-AriaNeural",
+          "name": "Aria (Confident Lead)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": [
+            "Protagonist",
+            "Strong"
+          ]
+        },
+        {
+          "id": "en-US-AriaNeural",
+          "name": "Aria (US)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-KE-AsiliaNeural",
+          "name": "Asilia (KE)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-US-AvaNeural",
+          "name": "Ava (US)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-US-AvaMultilingualNeural",
+          "name": "Ava (US)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-CA-ClaraNeural",
+          "name": "Clara (CA)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-IE-EmilyNeural",
+          "name": "Emily (IE)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-US-EmmaNeural",
+          "name": "Emma (US)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-US-EmmaMultilingualNeural",
+          "name": "Emma (US)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-NG-EzinneNeural",
+          "name": "Ezinne (NG)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-TZ-ImaniNeural",
+          "name": "Imani (TZ)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-US-JennyNeural",
+          "name": "Jenny (US)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-ZA-LeahNeural",
+          "name": "Leah (ZA)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-GB-LibbyNeural",
+          "name": "Libby (GB)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-SG-LunaNeural",
+          "name": "Luna (SG)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-GB-MaisieNeural",
+          "name": "Maisie (GB)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-US-MichelleNeural",
+          "name": "Michelle (US)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-NZ-MollyNeural",
+          "name": "Molly (NZ)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-AU-NatashaNeural",
+          "name": "Natasha (AU)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-IN-NeerjaNeural",
+          "name": "Neerja (IN)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-IN-NeerjaExpressiveNeural",
+          "name": "NeerjaExpressive (IN)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-PH-RosaNeural",
+          "name": "Rosa (PH)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-GB-SoniaNeural",
+          "name": "Sonia (GB)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        },
+        {
+          "id": "en-HK-YanNeural",
+          "name": "Yan (HK)",
+          "gender": "Female",
+          "lang": "English",
+          "tags": []
+        }
+      ]
+    },
+    "f5_tts": {
+      "default_voice": "f5_builtin_female",
+      "voices": [
+        {"id": "f5_builtin_female", "name": "★ F5 Built-in Female (Reference)", "gender": "Female", "lang": "English", "tags": ["Built-in"]},
+        {"id": "adam_1", "name": "Adam 1 F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "adam_2", "name": "Adam 2 F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "adam_3", "name": "Adam 3 F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "adam_4", "name": "Adam 4 F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "adam_5", "name": "Adam 5 F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "adam_6", "name": "Adam 6 F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "austin", "name": "Austin F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "bill", "name": "Bill F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "brian_1", "name": "Brian 1 F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "brian_2", "name": "Brian 2 F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "callum", "name": "Callum F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "carter", "name": "Carter F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "daniel", "name": "Daniel F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "darian", "name": "Darian F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "david_1", "name": "David 1 F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "david_2", "name": "David 2 F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "david_3", "name": "David 3 F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "david_4", "name": "David 4 F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "david_5", "name": "David 5 F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "david_6", "name": "David 6 F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "declan_1", "name": "Declan 1 F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "declan_2", "name": "Declan 2 F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "deep_ray", "name": "Deep Ray F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "edward", "name": "Edward F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "george", "name": "George F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "hank", "name": "Hank F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "henry", "name": "Henry F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "james", "name": "James F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "jayce_1", "name": "Jayce 1 F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "jayce_2", "name": "Jayce 2 F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "john", "name": "John F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "liam", "name": "Liam F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "michael_1", "name": "Michael 1 F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "michael_2", "name": "Michael 2 F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "nathan", "name": "Nathan F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "pharaoh", "name": "Pharaoh F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "roger", "name": "Roger F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "thomas", "name": "Thomas F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "titan", "name": "Titan F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "victor", "name": "Victor F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "william_1", "name": "William 1 F", "gender": "Male", "lang": "English", "tags": ["Clone"]},
+        {"id": "william_2", "name": "William 2 F", "gender": "Male", "lang": "English", "tags": ["Clone"]}
+      ]
+    }
+  }
+};
 
     let currentGenderFilter = null;
 

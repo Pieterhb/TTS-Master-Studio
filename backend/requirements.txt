@@ -1,3 +1,5 @@
+# NOTE: torchcodec must NOT be installed - it breaks torchaudio on Windows without compatible DLLs.
+# If it gets reinstalled by pip, run: pip uninstall torchcodec -y
 fastapi
 uvicorn
 pydub
@@ -8,5 +10,8 @@ pydantic
 python-multipart
 kokoro-onnx
 soundfile
-styletts2
-ChatTTS
+librosa
+static-ffmpeg
+f5-tts
+huggingface-hub>=0.25.0
+accelerate>=0.33.0
