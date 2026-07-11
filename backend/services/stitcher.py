@@ -127,12 +127,14 @@ async def process_directed_tts_job(segments: list, speaker_mapping: dict):
         voice_id = speaker_mapping.get(speaker, "f5_builtin_female")
         
         emphasis_words = segment.get("emphasis_words", [])
-        for word in emphasis_words:
-            # Soft emphasis: uppercase the word only — avoids F5-TTS over-exclamating
-            # (appending '!' mid-sentence causes F5 to dramatically shout the word)
-            text = re.sub(rf'\b({re.escape(word)})\b', lambda m: m.group(0).upper(), text, flags=re.IGNORECASE)
+        # NOTE: Do NOT mutate the text for emphasis.
+        # F5-TTS treats ALL_CAPS as acronyms (spells letter-by-letter)
+        # and mid-sentence '!' as shouting — both degrade quality.
+        # The vocal_delivery + pace fields already guide the tone.
+        # emphasis_words is kept as LLM metadata only (unused at synthesis time).
             
         speed = speed_mappings.get(pace, 1.0)
+
         
         # Scale down LLM pauses — LLMs tend to output 800-1500ms which sounds robotic.
         # Cap at 500ms and apply a 0.6× multiplier for natural rhythm.
