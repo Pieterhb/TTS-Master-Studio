@@ -1274,6 +1274,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 directedAudioUrl = dd.audio_url;
                 wavesurferDirected.load(dd.audio_url + '?t=' + Date.now());
                 playDirectedBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                // Activate download button
+                const dlDir = document.getElementById('downloadDirectedBtn');
+                dlDir.href = dd.audio_url;
+                dlDir.classList.remove('opacity-50', 'pointer-events-none');
             } else {
                 alert('Directed generation failed.');
             }
@@ -1289,9 +1293,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (baselineRes.ok) {
                 const bd = await baselineRes.json();
                 currentAudioUrl = bd.audio_url;
-                // Load into the dedicated sandbox baseline player
                 wavesurferBaseline.load(bd.audio_url + '?t=' + Date.now());
                 playBtnBaseline.classList.remove('opacity-50', 'cursor-not-allowed');
+                // Activate download button
+                const dlBase = document.getElementById('downloadBaselineBtn');
+                dlBase.href = bd.audio_url;
+                dlBase.classList.remove('opacity-50', 'pointer-events-none');
             } else {
                 alert('Baseline generation failed.');
             }
