@@ -42,6 +42,9 @@ class DirectedSegment(BaseModel):
 class GenerateDirectedRequest(BaseModel):
     segments: List[DirectedSegment]
     speaker_mapping: Dict[str, str]
+    speed: float = 1.0
+    volume: float = 1.0
+    pitch: float = 1.0
 
 @app.post("/api/generate")
 async def generate_audio(request: GenerateRequest, background_tasks: BackgroundTasks):
@@ -64,7 +67,10 @@ async def generate_audio(request: GenerateRequest, background_tasks: BackgroundT
 async def generate_directed_audio(request: GenerateDirectedRequest, background_tasks: BackgroundTasks):
     result = await process_directed_tts_job(
         segments=[s.model_dump() if hasattr(s, 'model_dump') else s.dict() for s in request.segments],
-        speaker_mapping=request.speaker_mapping
+        speaker_mapping=request.speaker_mapping,
+        global_speed=request.speed,
+        global_volume=request.volume,
+        global_pitch=request.pitch
     )
     return result
 

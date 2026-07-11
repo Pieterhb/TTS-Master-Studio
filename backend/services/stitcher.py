@@ -99,7 +99,7 @@ async def process_tts_job(text: str, model: str, voice: str, speed: float, volum
         "srt_content": srt_content
     }
 
-async def process_directed_tts_job(segments: list, speaker_mapping: dict):
+async def process_directed_tts_job(segments: list, speaker_mapping: dict, global_speed: float = 1.0, global_volume: float = 1.0, global_pitch: float = 1.0):
     speed_mappings = {
         "Very Slow": 0.75,
         "Slow": 0.85,
@@ -142,15 +142,14 @@ async def process_directed_tts_job(segments: list, speaker_mapping: dict):
         text = re.sub(r',\s*([.!?])', r'\1', text)
         text = re.sub(r'^\s*,\s*', '', text).strip()
             
-        speed = speed_mappings.get(pace, 1.0)
-
-
+        # Apply both the pace multiplier (from LLM) and the user's global speed slider
+        final_speed = speed_mappings.get(pace, 1.0) * global_speed
         
         # Scale down LLM pauses — LLMs tend to output 800-1500ms which sounds robotic.
         # Cap at 500ms and apply a 0.6× multiplier for natural rhythm.
         scaled_pause = int(min(pause_ms * 0.6, 500))
         
-        filepath = await generate_tts_chunk(text, "f5_tts", voice_id, speed, 1.0, 1.0, f"dir_{i}", cache_dir)
+        filepath = await generate_tts_chunk(text, "f5_tts", voice_id, final_speed, global_volume, global_pitch, f"dir_{i}", cache_dir)
         chunk_files.append(filepath)
         pauses.append(scaled_pause)
 

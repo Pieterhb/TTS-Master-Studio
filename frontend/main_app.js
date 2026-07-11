@@ -1260,13 +1260,23 @@ document.addEventListener('DOMContentLoaded', () => {
         generateDirectedBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> GENERATING BASELINE + DIRECTED...';
         generateDirectedBtn.disabled = true;
 
+        const uiSpeed = parseFloat(speedInput.value);
+        const uiVolume = parseFloat(volumeInput.value);
+        const uiPitch = parseFloat(pitchInput.value);
+
         try {
             // ── Step 1: Directed (multi-segment, longer job) ──────────────────
             generateDirectedBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Step 1/2: Generating Directed Audio...';
             const directedRes = await fetch('/api/generate_directed', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ segments: data, speaker_mapping: speakerMapping })
+                body: JSON.stringify({ 
+                    segments: data, 
+                    speaker_mapping: speakerMapping,
+                    speed: uiSpeed,
+                    volume: uiVolume,
+                    pitch: uiPitch
+                })
             });
 
             if (directedRes.ok) {
@@ -1287,7 +1297,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const baselineRes = await fetch('/api/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: fullText, model: 'f5_tts', voice: narratorVoice, speed: 1.0, volume: 1.0, pitch: 1.0 })
+                body: JSON.stringify({ text: fullText, model: 'f5_tts', voice: narratorVoice, speed: uiSpeed, volume: uiVolume, pitch: uiPitch })
             });
 
             if (baselineRes.ok) {
