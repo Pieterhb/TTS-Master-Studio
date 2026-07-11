@@ -142,60 +142,146 @@
         </aside>
 
         <!-- RIGHT COLUMN -->
-        <main class="w-[65%] p-6 flex flex-col gap-6 bg-[#0a1024]">
+        <main class="w-[65%] p-6 flex flex-col gap-6 bg-[#0a1024] overflow-y-auto custom-scrollbar">
             
-            <!-- Workspace -->
-            <div class="bg-gray-900 border border-gray-700 rounded-lg flex flex-col h-1/3 shadow-xl relative">
-                <textarea id="textInput" class="w-full flex-1 bg-transparent p-4 resize-none focus:outline-none custom-scrollbar" placeholder="Paste up to 30,000 words here..."></textarea>
-                <div class="border-t border-gray-700 p-2 flex justify-between text-xs text-gray-400 bg-gray-800 rounded-b-lg">
-                    <span>Word Count: <span id="wordCount" class="text-textSub">0</span> / 30,000</span>
-                    <span>Estimated Chunks: <span id="chunkCount" class="text-accent">0</span></span>
-                </div>
+            <!-- Tabs -->
+            <div class="flex border-b border-gray-700 flex-shrink-0">
+                <button id="tabStandard" class="px-6 py-3 border-b-2 border-accent text-accent font-bold tracking-wider transition-colors hover:bg-gray-800">STANDARD</button>
+                <button id="tabSandbox" class="px-6 py-3 border-b-2 border-transparent text-gray-400 font-bold tracking-wider transition-colors hover:text-white hover:bg-gray-800"><i class="fas fa-flask mr-2 text-yellow-500"></i>DIRECTED SANDBOX (F5-TTS)</button>
             </div>
 
-            <!-- Generate Button -->
-            <button id="generateBtn" class="w-full bg-highlight hover:bg-highlightHover transition-all shadow-[0_0_15px_rgba(249,115,22,0.5)] py-4 rounded-xl text-xl font-bold tracking-wide group relative overflow-hidden">
-                <span class="relative z-10"><i class="fas fa-bolt mr-2 text-yellow-300"></i> GENERATE SPEECH & SRT</span>
-                <div class="absolute inset-0 h-full w-0 bg-white/20 transition-all duration-300 ease-out group-hover:w-full z-0"></div>
-            </button>
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <!-- STANDARD WORKSPACE                                       -->
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <div id="standardWorkspace" class="flex flex-col gap-6 flex-shrink-0">
 
-            <!-- Audio Preview -->
-            <div class="bg-gray-900 border border-gray-700 rounded-lg p-4 shadow-xl">
-                <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Audio Preview <span id="audioLength" class="text-accent font-bold font-mono ml-2"></span></h3>
-                <div class="flex items-center gap-4">
-                    <button id="playBtn" class="w-12 h-12 bg-accent rounded-full flex justify-center items-center hover:bg-accentHover transition-colors shadow-lg shadow-accent/30">
-                        <i class="fas fa-play ml-1"></i>
-                    </button>
-                    <div id="waveform" class="flex-1 cursor-pointer"></div>
+                <!-- Text Input -->
+                <div class="bg-gray-900 border border-gray-700 rounded-lg flex flex-col min-h-[300px] shadow-xl">
+                    <textarea id="textInput" class="w-full flex-1 bg-transparent p-4 resize-none focus:outline-none custom-scrollbar" placeholder="Paste up to 30,000 words here..."></textarea>
+                    <div class="border-t border-gray-700 p-2 flex justify-between text-xs text-gray-400 bg-gray-800 rounded-b-lg">
+                        <span>Word Count: <span id="wordCount" class="text-textSub">0</span> / 30,000</span>
+                        <span>Estimated Chunks: <span id="chunkCount" class="text-accent">0</span></span>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Previews -->
-            <div class="flex gap-6 h-full min-h-[250px]">
-                
-                <!-- Capcut Preview -->
-                <div class="flex-1 bg-gray-900 border border-gray-700 rounded-lg p-4 flex flex-col shadow-xl">
-                    <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Visual Preview</h3>
-                    <div class="flex-1 bg-black rounded-lg border-2 border-gray-800 relative flex justify-center items-center overflow-hidden">
-                        <div class="w-[200px] h-full bg-gray-900 border-x border-gray-800 flex flex-col justify-center items-center p-4 text-center">
-                            <span id="captionDisplay" class="text-yellow-400 font-bold text-2xl" style="text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">
-                                [Caption]
-                            </span>
+                <!-- Generate Button -->
+                <button id="generateBtn" class="w-full bg-highlight hover:bg-highlightHover transition-all shadow-[0_0_15px_rgba(249,115,22,0.5)] py-4 rounded-xl text-xl font-bold tracking-wide group relative overflow-hidden">
+                    <span class="relative z-10"><i class="fas fa-bolt mr-2 text-yellow-300"></i> GENERATE SPEECH & SRT</span>
+                    <div class="absolute inset-0 h-full w-0 bg-white/20 transition-all duration-300 ease-out group-hover:w-full z-0"></div>
+                </button>
+
+                <!-- Standard Audio Player -->
+                <div class="bg-gray-900 border border-gray-700 rounded-lg p-4 shadow-xl">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Audio Preview <span id="audioLength" class="text-accent font-bold font-mono ml-2"></span></h3>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <button id="playBtn" class="w-10 h-10 bg-accent rounded-full flex justify-center items-center hover:bg-accentHover transition-colors shadow-lg shadow-accent/30 flex-shrink-0">
+                            <i class="fas fa-play ml-1"></i>
+                        </button>
+                        <div id="waveform" class="flex-1 cursor-pointer"></div>
+                    </div>
+                </div>
+
+                <!-- Visual Preview + SRT -->
+                <div class="flex gap-6 min-h-[280px] flex-shrink-0">
+                    <div class="flex-1 bg-gray-900 border border-gray-700 rounded-lg p-4 flex flex-col shadow-xl">
+                        <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Visual Preview</h3>
+                        <div class="flex-1 bg-black rounded-lg border-2 border-gray-800 relative flex justify-center items-center overflow-hidden">
+                            <div class="w-[200px] h-full bg-gray-900 border-x border-gray-800 flex flex-col justify-center items-center p-4 text-center">
+                                <span id="captionDisplay" class="text-yellow-400 font-bold text-2xl" style="text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">[Caption]</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-1 bg-gray-900 border border-gray-700 rounded-lg flex flex-col shadow-xl">
+                        <div class="border-b border-gray-700 p-3 bg-gray-800 rounded-t-lg flex justify-between items-center">
+                            <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">SRT Editor</h3>
+                            <i class="fas fa-edit text-gray-500 cursor-pointer hover:text-white"></i>
+                        </div>
+                        <div id="srtOutput" class="flex-1 p-4 overflow-y-auto custom-scrollbar font-mono text-sm text-gray-300">
+                            <div class="text-gray-500 italic text-center mt-10">Captions will appear here...</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- SRT Output -->
-                <div class="flex-1 bg-gray-900 border border-gray-700 rounded-lg flex flex-col shadow-xl">
-                    <div class="border-b border-gray-700 p-3 bg-gray-800 rounded-t-lg flex justify-between items-center">
-                        <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">SRT Editor</h3>
-                        <i class="fas fa-edit text-gray-500 cursor-pointer hover:text-white"></i>
+            </div><!-- end standardWorkspace -->
+
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <!-- SANDBOX WORKSPACE                                        -->
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <div id="sandboxWorkspace" class="hidden flex-col gap-6 flex-shrink-0">
+
+                <!-- Step 1: Copy Prompt -->
+                <div class="bg-gray-800 border border-yellow-600/50 rounded-lg p-4 shadow-xl">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-sm font-bold text-yellow-500"><i class="fas fa-robot mr-2"></i>1. Copy Prompt for LLM (Gemini / ChatGPT)</h3>
+                        <button id="copyPromptBtn" class="bg-gray-700 hover:bg-gray-600 text-xs py-1 px-3 rounded text-white transition-colors"><i class="fas fa-copy mr-1"></i> Copy Prompt</button>
                     </div>
-                    <div id="srtOutput" class="flex-1 p-4 overflow-y-auto custom-scrollbar font-mono text-sm text-gray-300">
-                        <div class="text-gray-500 italic text-center mt-10">Captions will appear here...</div>
+                    <textarea id="promptText" class="w-full h-24 bg-gray-900 text-gray-400 p-2 text-xs font-mono rounded resize-none focus:outline-none" readonly>You are an expert audiobook and voiceover director. Analyze the text and break it down into logical, sentence-level segments for text-to-speech. Output a JSON array with objects containing these exact keys: "segment_id" (int), "speaker" (character name or "Narrator"), "text" (exact text), "pace" ("Slow", "Normal", "Fast"), "vocal_delivery" (e.g. "Neutral", "Tense", "Battle-Fury"), "pause_after_ms" (int, 200-1500), "emphasis_words" (array of 1-3 words). RULES: Separate dialogue from narrative tags ("says X" is Narrator). Respond ONLY with raw JSON array.
+
+Here is the text to process:</textarea>
+                </div>
+
+                <!-- Step 2: Paste JSON + Map Voices -->
+                <div class="bg-gray-900 border border-gray-700 rounded-lg flex flex-col min-h-[250px] shadow-xl">
+                    <div class="p-2 bg-gray-800 border-b border-gray-700 text-xs font-bold text-gray-300 flex justify-between items-center">
+                        <span><i class="fas fa-code mr-2"></i>2. Paste Directed JSON — then Map Voices</span>
+                        <button id="mapSpeakersBtn" class="bg-accent hover:bg-accentHover text-white px-3 py-1 rounded transition-colors text-xs">Map Voices</button>
+                    </div>
+                    <textarea id="jsonInput" class="w-full flex-1 bg-transparent p-4 resize-none focus:outline-none custom-scrollbar font-mono text-sm text-green-400" placeholder="[ {&#10;  &quot;segment_id&quot;: 1,&#10;  &quot;speaker&quot;: &quot;Narrator&quot;,&#10;  &quot;text&quot;: &quot;Paste JSON here...&quot;&#10;} ]"></textarea>
+                </div>
+
+                <!-- Step 3: ONE Generate & Compare button -->
+                <button id="generateDirectedBtn" class="w-full bg-yellow-600 hover:bg-yellow-500 transition-all shadow-[0_0_15px_rgba(202,138,4,0.5)] py-4 rounded-xl text-xl font-bold tracking-wide group relative overflow-hidden">
+                    <span class="relative z-10"><i class="fas fa-magic mr-2 text-white"></i> 3. GENERATE &amp; COMPARE (F5-TTS)</span>
+                    <div class="absolute inset-0 h-full w-0 bg-white/20 transition-all duration-300 ease-out group-hover:w-full z-0"></div>
+                </button>
+
+                <!-- Dual Audio Players -->
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Directed (with preprocessing) — LEFT -->
+                    <div class="bg-gray-900 border border-yellow-700/50 rounded-lg p-4 shadow-xl">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-xs font-semibold text-yellow-600 uppercase tracking-wider">Directed <span id="directedAudioLength" class="text-yellow-500 font-bold font-mono ml-1"></span></h3>
+                            <span class="text-[10px] bg-yellow-900/50 text-yellow-600 px-2 py-1 rounded border border-yellow-800">LLM Directed</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button id="playDirectedBtn" class="w-10 h-10 bg-yellow-600 rounded-full flex justify-center items-center hover:bg-yellow-500 transition-colors shadow-lg shadow-yellow-600/30 flex-shrink-0 opacity-50 cursor-not-allowed">
+                                <i class="fas fa-play ml-1"></i>
+                            </button>
+                            <div id="waveformDirected" class="flex-1 cursor-pointer"></div>
+                        </div>
+                    </div>
+                    <!-- Baseline (no preprocessing) — RIGHT -->
+                    <div class="bg-gray-900 border border-gray-700 rounded-lg p-4 shadow-xl">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Baseline <span id="baselineAudioLength" class="text-accent font-bold font-mono ml-1"></span></h3>
+                            <span class="text-[10px] bg-gray-800 px-2 py-1 rounded text-gray-500">No Preprocessing</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button id="playBtnBaseline" class="w-10 h-10 bg-accent rounded-full flex justify-center items-center hover:bg-accentHover transition-colors shadow-lg shadow-accent/30 flex-shrink-0 opacity-50 cursor-not-allowed">
+                                <i class="fas fa-play ml-1"></i>
+                            </button>
+                            <div id="waveformBaseline" class="flex-1 cursor-pointer"></div>
+                        </div>
                     </div>
                 </div>
 
+
+            </div><!-- end sandboxWorkspace -->
+
+            <!-- Speaker Mapping Modal (Hidden) -->
+            <div id="speakerModal" class="fixed inset-0 bg-black/80 flex justify-center items-center z-50 hidden">
+                <div class="bg-gray-900 border border-gray-700 p-6 rounded-lg shadow-2xl w-[500px] max-h-[80vh] flex flex-col">
+                    <h2 class="text-xl font-bold mb-4 text-accent border-b border-gray-700 pb-2">Map Speakers to F5-TTS Voices</h2>
+                    <div id="speakerMapContainer" class="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-3 pr-2">
+                        <!-- Populated dynamically -->
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-gray-700 flex justify-end gap-3">
+                        <button id="closeSpeakerModalBtn" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded transition-colors text-sm">Cancel</button>
+                        <button id="saveSpeakerModalBtn" class="px-4 py-2 bg-accent hover:bg-accentHover rounded transition-colors font-bold text-sm">Save Mapping</button>
+                    </div>
+                </div>
             </div>
             
         </main>

@@ -2,12 +2,45 @@ import os
 import shutil
 from gradio_client import Client
 
+# ── torchcodec workaround ────────────────────────────────────────────────────
+# The installed torchcodec is incompatible with PyTorch 2.5.1+cu121 on Windows
+# (missing libtorchcodec_core*.dll). Setting this env var at module-load time
+# tells torchaudio to skip its torchcodec backend entirely, before any import.
+os.environ["TORCHAUDIO_USE_TORCHCODEC"] = "0"
+# ─────────────────────────────────────────────────────────────────────────────
+
 # Make FFmpeg available to all libraries (torchaudio, pydub, transformers ASR)
 try:
     import static_ffmpeg
     static_ffmpeg.add_paths()
 except Exception:
     pass  # FFmpeg already on PATH or not installed
+
+# ── F5-TTS singleton ──────────────────────────────────────────────────────────
+# The model is ~1.2GB. Loading it fresh on every segment call wastes seconds.
+# We load it once on first use and reuse the same instance for all calls.
+_f5_model = None
+
+def _get_f5_model():
+    global _f5_model
+    if _f5_model is None:
+        import torch
+        import torchaudio
+        import soundfile as sf
+        def _sf_load(path, **kw):
+            data, sr_file = sf.read(str(path), dtype='float32', always_2d=False)
+            if data.ndim > 1:
+                data = data.mean(axis=1)
+            import torch as _torch
+            return _torch.from_numpy(data).unsqueeze(0), sr_file
+        torchaudio.load = _sf_load
+        from f5_tts.api import F5TTS
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        print(f"[F5-TTS] Loading model on {device.upper()} (first use only)...")
+        _f5_model = F5TTS(device=device)
+        print("[F5-TTS] Model ready.")
+    return _f5_model
+# ─────────────────────────────────────────────────────────────────────────────
 
 async def generate_tts_chunk(text: str, model: str, voice: str, speed: float, volume: float, pitch: float, index: int, cache_dir: str):
     output_path = os.path.join(cache_dir, f"chunk_{index}.wav")
@@ -48,26 +81,8 @@ async def generate_tts_chunk(text: str, model: str, voice: str, speed: float, vo
                 import numpy as np
                 import soundfile as sf
                 
-                # Bypass torchaudio's torchcodec/FFmpeg backend for WAV loading.
-                # torchcodec gets reinstalled by pip with CUDA torch but its DLLs
-                # are incompatible with Windows. We replace torchaudio.load with a
-                # pure soundfile-based loader. static_ffmpeg provides FFmpeg for
-                # the Whisper ASR transcription pipeline.
-                import torchaudio
-                def _sf_load(path, **kw):
-                    data, sr_file = sf.read(str(path), dtype='float32', always_2d=False)
-                    if data.ndim > 1:
-                        data = data.mean(axis=1)
-                    tensor = torch.from_numpy(data).unsqueeze(0)  # (1, N)
-                    return tensor, sr_file
-                torchaudio.load = _sf_load
-                
-                # === LOAD F5-TTS ON GPU ===
-                # torchaudio now works natively because static_ffmpeg is in PATH
-                from f5_tts.api import F5TTS
-                device = "cuda" if torch.cuda.is_available() else "cpu"
-                print(f"F5-TTS device: {device.upper()}")
-                f5 = F5TTS(device=device)
+                # Reuse the cached singleton — model is only loaded once per server process.
+                f5 = _get_f5_model()
                 
                 # === RESOLVE REFERENCE AUDIO ===
                 ref_dir = os.path.join("models", "f5_tts", "references")

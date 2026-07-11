@@ -13,6 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
         barGap: 3
     });
 
+    // Sandbox WaveSurfer instances — initialized lazily on first tab open
+    // (WaveSurfer throws if container is display:none at creation time)
+    let wavesurferDirected = null;
+    let wavesurferBaseline = null;
+
     // Elements
     const textInput = document.getElementById('textInput');
     const wordCount = document.getElementById('wordCount');
@@ -39,9 +44,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const exportWavBtn = document.getElementById('exportWavBtn');
     const exportSrtBtn = document.getElementById('exportSrtBtn');
 
+    // Sandbox Elements
+    const tabStandard = document.getElementById('tabStandard');
+    const tabSandbox = document.getElementById('tabSandbox');
+    const standardWorkspace = document.getElementById('standardWorkspace');
+    const sandboxWorkspace = document.getElementById('sandboxWorkspace');
+    const copyPromptBtn = document.getElementById('copyPromptBtn');
+    const promptText = document.getElementById('promptText');
+    const mapSpeakersBtn = document.getElementById('mapSpeakersBtn');
+    const jsonInput = document.getElementById('jsonInput');
+    const generateDirectedBtn = document.getElementById('generateDirectedBtn');
+    const playDirectedBtn = document.getElementById('playDirectedBtn');
+    const playBtnBaseline = document.getElementById('playBtnBaseline');
+    const speakerModal = document.getElementById('speakerModal');
+    const closeSpeakerModalBtn = document.getElementById('closeSpeakerModalBtn');
+    const saveSpeakerModalBtn = document.getElementById('saveSpeakerModalBtn');
+    const speakerMapContainer = document.getElementById('speakerMapContainer');
+
     let srtData = [];
     let currentAudioUrl = null;
     let currentSrtUrl = null;
+    
+    let directedAudioUrl = null;
+    let speakerMapping = {}; // e.g. { "Narrator": "f5_builtin_female" }
 
     // WAV Encoding function (32-bit IEEE Float for Lossless Studio Quality)
     function audioBufferToWav(buffer) {
@@ -1076,4 +1101,231 @@ document.addEventListener('DOMContentLoaded', () => {
         const date = new Date(seconds * 1000);
         return date.toISOString().substr(14, 5);
     }
+
+    // --- SANDBOX LOGIC ---
+
+    // Tab Switching
+    tabStandard.addEventListener('click', () => {
+        tabStandard.classList.remove('border-transparent', 'text-gray-400');
+        tabStandard.classList.add('border-accent', 'text-accent');
+        tabSandbox.classList.remove('border-yellow-500', 'text-yellow-500');
+        tabSandbox.classList.add('border-transparent', 'text-gray-400');
+        standardWorkspace.classList.remove('hidden');
+        standardWorkspace.classList.add('flex');
+        sandboxWorkspace.classList.add('hidden');
+        sandboxWorkspace.classList.remove('flex');
+    });
+
+    tabSandbox.addEventListener('click', () => {
+        tabSandbox.classList.remove('border-transparent', 'text-gray-400');
+        tabSandbox.classList.add('border-yellow-500', 'text-yellow-500');
+        tabStandard.classList.remove('border-accent', 'text-accent');
+        tabStandard.classList.add('border-transparent', 'text-gray-400');
+        sandboxWorkspace.classList.remove('hidden');
+        sandboxWorkspace.classList.add('flex');
+        standardWorkspace.classList.add('hidden');
+        standardWorkspace.classList.remove('flex');
+
+        // Lazy-init sandbox WaveSurfers now that containers are visible
+        if (!wavesurferDirected) {
+            wavesurferDirected = WaveSurfer.create({
+                container: '#waveformDirected',
+                waveColor: '#713f12',
+                progressColor: '#ca8a04',
+                cursorColor: '#facc15',
+                barWidth: 2, barRadius: 3, cursorWidth: 1, height: 60, barGap: 3
+            });
+            wavesurferDirected.on('finish', () => { playDirectedBtn.innerHTML = '<i class="fas fa-play ml-1"></i>'; });
+            wavesurferDirected.on('ready', () => {
+                const d = wavesurferDirected.getDuration();
+                const el = document.getElementById('directedAudioLength');
+                if (el) el.textContent = `(${Math.floor(d/3600).toString().padStart(2,'0')}:${Math.floor((d%3600)/60).toString().padStart(2,'0')}:${Math.floor(d%60).toString().padStart(2,'0')})`;
+            });
+        }
+        if (!wavesurferBaseline) {
+            wavesurferBaseline = WaveSurfer.create({
+                container: '#waveformBaseline',
+                waveColor: '#1e3a5f',
+                progressColor: '#3B82F6',
+                cursorColor: '#60a5fa',
+                barWidth: 2, barRadius: 3, cursorWidth: 1, height: 60, barGap: 3
+            });
+            wavesurferBaseline.on('finish', () => { playBtnBaseline.innerHTML = '<i class="fas fa-play ml-1"></i>'; });
+            wavesurferBaseline.on('ready', () => {
+                const d = wavesurferBaseline.getDuration();
+                const el = document.getElementById('baselineAudioLength');
+                if (el) el.textContent = `(${Math.floor(d/3600).toString().padStart(2,'0')}:${Math.floor((d%3600)/60).toString().padStart(2,'0')}:${Math.floor(d%60).toString().padStart(2,'0')})`;
+            });
+        }
+    });
+
+    // Copy Prompt
+    copyPromptBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(promptText.value);
+        const originalText = copyPromptBtn.innerHTML;
+        copyPromptBtn.innerHTML = '<i class="fas fa-check mr-1"></i> Copied!';
+        copyPromptBtn.classList.replace('bg-gray-700', 'bg-green-600');
+        setTimeout(() => {
+            copyPromptBtn.innerHTML = originalText;
+            copyPromptBtn.classList.replace('bg-green-600', 'bg-gray-700');
+        }, 2000);
+    });
+
+    // Speaker Mapping Modal
+    mapSpeakersBtn.addEventListener('click', () => {
+        try {
+            const jsonStr = jsonInput.value.trim();
+            if (!jsonStr) return alert("Please paste the JSON first.");
+            
+            // Clean up backticks if they pasted a markdown block
+            const cleanStr = jsonStr.replace(/```json/g, '').replace(/```/g, '').trim();
+            const data = JSON.parse(cleanStr);
+            
+            // Extract unique speakers
+            const speakers = [...new Set(data.map(item => item.speaker))];
+            
+            speakerMapContainer.innerHTML = '';
+            
+            const f5Voices = config.models.f5_tts.voices;
+            
+            speakers.forEach(speaker => {
+                const row = document.createElement('div');
+                row.className = 'flex justify-between items-center bg-gray-800 p-3 rounded';
+                
+                // Try to find a match
+                let defaultMatch = "f5_builtin_female";
+                const potentialMatch = f5Voices.find(v => v.id.toLowerCase().includes(speaker.toLowerCase().replace(/\s+/g, '_')) || v.name.toLowerCase().includes(speaker.toLowerCase()));
+                if(potentialMatch) defaultMatch = potentialMatch.id;
+                
+                // If previously mapped, use that
+                if (speakerMapping[speaker]) {
+                    defaultMatch = speakerMapping[speaker];
+                }
+
+                let optionsHtml = f5Voices.map(v => `<option value="${v.id}" ${v.id === defaultMatch ? 'selected' : ''}>${v.name}</option>`).join('');
+
+                row.innerHTML = `
+                    <span class="font-bold text-gray-300 w-1/3 truncate" title="${speaker}">${speaker}</span>
+                    <i class="fas fa-arrow-right text-gray-600 mx-2"></i>
+                    <select class="speaker-select w-2/3 bg-gray-900 border border-gray-700 rounded p-2 text-sm focus:outline-none focus:border-accent" data-speaker="${speaker}">
+                        ${optionsHtml}
+                    </select>
+                `;
+                speakerMapContainer.appendChild(row);
+            });
+            
+            speakerModal.classList.remove('hidden');
+        } catch (e) {
+            alert("Invalid JSON format. Please ensure you copied only the JSON array.");
+            console.error(e);
+        }
+    });
+
+    closeSpeakerModalBtn.addEventListener('click', () => {
+        speakerModal.classList.add('hidden');
+    });
+
+    saveSpeakerModalBtn.addEventListener('click', () => {
+        const selects = document.querySelectorAll('.speaker-select');
+        selects.forEach(select => {
+            const speaker = select.getAttribute('data-speaker');
+            speakerMapping[speaker] = select.value;
+        });
+        speakerModal.classList.add('hidden');
+        alert("Speaker mappings saved!");
+    });
+
+    // Generate & Compare — one button fires BOTH baseline and directed simultaneously
+    generateDirectedBtn.addEventListener('click', async () => {
+        const jsonStr = jsonInput.value.trim();
+        if (!jsonStr) return alert('Please paste the JSON first.');
+
+        let data;
+        try {
+            const cleanStr = jsonStr.replace(/```json/g, '').replace(/```/g, '').trim();
+            data = JSON.parse(cleanStr);
+        } catch (e) {
+            return alert("Invalid JSON format.");
+        }
+
+        // Reconstruct full clean text for baseline (no emphasis mutations)
+        const fullText = data.map(seg => seg.text).join(' ');
+
+        // Voice for baseline: Narrator mapping → first mapping → built-in fallback
+        const narratorVoice = speakerMapping['Narrator']
+            || Object.values(speakerMapping)[0]
+            || 'f5_builtin_female';
+
+        const originalBtnText = generateDirectedBtn.innerHTML;
+        generateDirectedBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> GENERATING BASELINE + DIRECTED...';
+        generateDirectedBtn.disabled = true;
+
+        try {
+            // ── Step 1: Directed (multi-segment, longer job) ──────────────────
+            generateDirectedBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Step 1/2: Generating Directed Audio...';
+            const directedRes = await fetch('/api/generate_directed', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ segments: data, speaker_mapping: speakerMapping })
+            });
+
+            if (directedRes.ok) {
+                const dd = await directedRes.json();
+                directedAudioUrl = dd.audio_url;
+                wavesurferDirected.load(dd.audio_url + '?t=' + Date.now());
+                playDirectedBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                alert('Directed generation failed.');
+            }
+
+            // ── Step 2: Baseline (single-pass, same voice, no preprocessing) ──
+            generateDirectedBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Step 2/2: Generating Baseline Audio...';
+            const baselineRes = await fetch('/api/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: fullText, model: 'f5_tts', voice: narratorVoice, speed: 1.0, volume: 1.0, pitch: 1.0 })
+            });
+
+            if (baselineRes.ok) {
+                const bd = await baselineRes.json();
+                currentAudioUrl = bd.audio_url;
+                // Load into the dedicated sandbox baseline player
+                wavesurferBaseline.load(bd.audio_url + '?t=' + Date.now());
+                playBtnBaseline.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                alert('Baseline generation failed.');
+            }
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred during generation.');
+        } finally {
+            generateDirectedBtn.innerHTML = originalBtnText;
+            generateDirectedBtn.disabled = false;
+        }
+    });
+
+    playDirectedBtn.addEventListener('click', () => {
+        if (!directedAudioUrl || !wavesurferDirected) return;
+        if (wavesurferDirected.isPlaying()) {
+            wavesurferDirected.pause();
+            playDirectedBtn.innerHTML = '<i class="fas fa-play ml-1"></i>';
+        } else {
+            wavesurferDirected.play();
+            playDirectedBtn.innerHTML = '<i class="fas fa-pause"></i>';
+        }
+    });
+
+    playBtnBaseline.addEventListener('click', () => {
+        if (!currentAudioUrl || !wavesurferBaseline) return;
+        if (wavesurferBaseline.isPlaying()) {
+            wavesurferBaseline.pause();
+            playBtnBaseline.innerHTML = '<i class="fas fa-play ml-1"></i>';
+        } else {
+            wavesurferBaseline.play();
+            playBtnBaseline.innerHTML = '<i class="fas fa-pause"></i>';
+        }
+    });
+
 });
+

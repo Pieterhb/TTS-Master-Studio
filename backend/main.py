@@ -4,9 +4,10 @@ from fastapi import FastAPI, BackgroundTasks, UploadFile, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from typing import Dict, List, Optional
 from dotenv import load_dotenv
 
-from services.stitcher import process_tts_job
+from services.stitcher import process_tts_job, process_directed_tts_job
 
 load_dotenv()
 
@@ -29,6 +30,19 @@ class GenerateRequest(BaseModel):
     pitch: float = 1.0
     emotion: str = "Storyteller"
 
+class DirectedSegment(BaseModel):
+    segment_id: int
+    speaker: str
+    text: str
+    pace: str
+    vocal_delivery: str
+    pause_after_ms: int
+    emphasis_words: Optional[List[str]] = []
+
+class GenerateDirectedRequest(BaseModel):
+    segments: List[DirectedSegment]
+    speaker_mapping: Dict[str, str]
+
 @app.post("/api/generate")
 async def generate_audio(request: GenerateRequest, background_tasks: BackgroundTasks):
     # This is a synchronous endpoint that kicks off the process
@@ -44,6 +58,14 @@ async def generate_audio(request: GenerateRequest, background_tasks: BackgroundT
         pitch=request.pitch
     )
     
+    return result
+
+@app.post("/api/generate_directed")
+async def generate_directed_audio(request: GenerateDirectedRequest, background_tasks: BackgroundTasks):
+    result = await process_directed_tts_job(
+        segments=[s.model_dump() if hasattr(s, 'model_dump') else s.dict() for s in request.segments],
+        speaker_mapping=request.speaker_mapping
+    )
     return result
 
 # Serve static files for the frontend

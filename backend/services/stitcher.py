@@ -98,3 +98,86 @@ async def process_tts_job(text: str, model: str, voice: str, speed: float, volum
         "srt_url": f"/exports/output.srt",
         "srt_content": srt_content
     }
+
+async def process_directed_tts_job(segments: list, speaker_mapping: dict):
+    speed_mappings = {
+        "Very Slow": 0.75,
+        "Slow": 0.85,
+        "Normal": 1.00,
+        "Fast": 1.15,
+        "Very Fast": 1.30
+    }
+    
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    cache_dir = os.path.join(base_dir, "backend", "cache")
+    exports_dir = os.path.join(base_dir, "frontend", "exports")
+    
+    os.makedirs(cache_dir, exist_ok=True)
+    os.makedirs(exports_dir, exist_ok=True)
+    
+    chunk_files = []
+    pauses = []
+    
+    for i, segment in enumerate(segments):
+        speaker = segment.get("speaker", "Narrator")
+        text = segment.get("text", "")
+        pace = segment.get("pace", "Normal")
+        pause_ms = segment.get("pause_after_ms", 0)
+        
+        voice_id = speaker_mapping.get(speaker, "f5_builtin_female")
+        
+        emphasis_words = segment.get("emphasis_words", [])
+        for word in emphasis_words:
+            # basic emphasis text transformation (uppercase and exclamation)
+            text = re.sub(rf'\b({re.escape(word)})\b', r'\1!', text, flags=re.IGNORECASE)
+            
+        speed = speed_mappings.get(pace, 1.0)
+        
+        filepath = await generate_tts_chunk(text, "f5_tts", voice_id, speed, 1.0, 1.0, f"dir_{i}", cache_dir)
+        chunk_files.append(filepath)
+        pauses.append(pause_ms)
+
+    output_audio_path = os.path.join(exports_dir, "output_directed.wav")
+
+    # Use soundfile + numpy for stitching.
+    # Python's built-in wave module silently fails on float32 WAV (IEEE format type 3),
+    # which is what soundfile writes by default. soundfile handles it correctly.
+    import soundfile as sf
+    import numpy as np
+
+    all_audio = []
+    sample_rate = None
+
+    for i, file in enumerate(chunk_files):
+        try:
+            audio, sr = sf.read(file, dtype='float32', always_2d=True)  # always (N, channels)
+            if sample_rate is None:
+                sample_rate = sr
+            all_audio.append(audio)
+
+            # Insert precise silence after this segment
+            pause_ms = pauses[i]
+            if pause_ms > 0:
+                silence_frames = int(sr * (pause_ms / 1000.0))
+                silence = np.zeros((silence_frames, audio.shape[1]), dtype='float32')
+                all_audio.append(silence)
+        except Exception as e:
+            print(f"[Directed Stitcher] Error reading chunk {file}: {e}")
+
+    if all_audio and sample_rate:
+        combined = np.concatenate(all_audio, axis=0)
+        sf.write(output_audio_path, combined, sample_rate)
+        print(f"[Directed Stitcher] Wrote {len(combined)/sample_rate:.1f}s of audio.")
+    else:
+        print("[Directed Stitcher] ERROR: No audio data collected — file not created.")
+
+    for file in chunk_files:
+        if os.path.exists(file):
+            try:
+                os.remove(file)
+            except:
+                pass
+
+    return {
+        "audio_url": "/exports/output_directed.wav"
+    }
