@@ -128,14 +128,19 @@ async def process_directed_tts_job(segments: list, speaker_mapping: dict):
         
         emphasis_words = segment.get("emphasis_words", [])
         for word in emphasis_words:
-            # basic emphasis text transformation (uppercase and exclamation)
-            text = re.sub(rf'\b({re.escape(word)})\b', r'\1!', text, flags=re.IGNORECASE)
+            # Soft emphasis: uppercase the word only — avoids F5-TTS over-exclamating
+            # (appending '!' mid-sentence causes F5 to dramatically shout the word)
+            text = re.sub(rf'\b({re.escape(word)})\b', lambda m: m.group(0).upper(), text, flags=re.IGNORECASE)
             
         speed = speed_mappings.get(pace, 1.0)
         
+        # Scale down LLM pauses — LLMs tend to output 800-1500ms which sounds robotic.
+        # Cap at 500ms and apply a 0.6× multiplier for natural rhythm.
+        scaled_pause = int(min(pause_ms * 0.6, 500))
+        
         filepath = await generate_tts_chunk(text, "f5_tts", voice_id, speed, 1.0, 1.0, f"dir_{i}", cache_dir)
         chunk_files.append(filepath)
-        pauses.append(pause_ms)
+        pauses.append(scaled_pause)
 
     output_audio_path = os.path.join(exports_dir, "output_directed.wav")
 
